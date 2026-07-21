@@ -5,1628 +5,1064 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PV String Calculator — KlimaatWatt</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap');
 
-  :root {
-    --navy:    #0f1f3d;
-    --navy2:   #1a2f55;
-    --blue:    #1e4aad;
-    --sky:     #3b82f6;
-    --yellow:  #f6b824;
-    --yellow2: #fde68a;
-    --green:   #16a34a;
-    --green-bg:#dcfce7;
-    --orange:  #ea580c;
-    --orange-bg:#ffedd5;
-    --red:     #dc2626;
-    --red-bg:  #fee2e2;
-    --purple-bg:#ede9fe;
-    --gray1:   #f8fafc;
-    --gray2:   #f1f5f9;
-    --gray3:   #e2e8f0;
-    --gray4:   #94a3b8;
-    --text:    #0f172a;
-    --text2:   #475569;
-    --input-bg:#fffbeb;
-    --auto-bg: #eff6ff;
-    --result-bg:#f0fdf4;
-    --mono: 'DM Mono', monospace;
-    --sans: 'DM Sans', sans-serif;
-    --display: 'Syne', sans-serif;
-  }
+:root {
+  --navy:   #0f1f3d; --navy2:  #1a2f55; --blue:   #1e4aad;
+  --yellow: #f6b824; --yellow2:#fde68a;
+  --green:  #16a34a; --green-bg:#dcfce7;
+  --orange-bg:#ffedd5; --red:#dc2626; --red-bg:#fee2e2;
+  --purple-bg:#ede9fe;
+  --gray1:#f8fafc; --gray2:#f1f5f9; --gray3:#e2e8f0; --gray4:#94a3b8;
+  --text:#0f172a; --text2:#475569;
+  --input-bg:#fffbeb; --auto-bg:#eff6ff; --locked:#eceff1;
+  --mono:'DM Mono',monospace; --sans:'DM Sans',sans-serif; --display:'Syne',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--gray2);color:var(--text);min-height:100vh}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+/* HEADER */
+header{background:var(--navy);padding:0 2rem;display:flex;align-items:stretch;position:relative;overflow:hidden}
+header::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px)}
+.ha{width:6px;background:var(--yellow);margin-right:1.5rem;flex-shrink:0}
+.ht{padding:1.5rem 0;z-index:1}
+.ht h1{font-family:var(--display);font-size:1.5rem;font-weight:800;color:#fff;letter-spacing:-.02em}
+.ht h1 span{color:var(--yellow)}
+.ht p{font-size:.8rem;color:rgba(255,255,255,.5);margin-top:.2rem;font-family:var(--mono)}
+.hb{margin-left:auto;display:flex;align-items:center;z-index:1}
+.hb span{background:var(--yellow);color:var(--navy);font-family:var(--mono);font-size:.7rem;font-weight:500;padding:.3rem .7rem;border-radius:2px}
 
-  body {
-    font-family: var(--sans);
-    background: var(--gray2);
-    color: var(--text);
-    min-height: 100vh;
-  }
+/* TABS */
+.tab-nav{background:var(--navy2);display:flex;padding:0 2rem;border-bottom:3px solid var(--yellow)}
+.tab-btn{font-family:var(--display);font-size:.82rem;font-weight:700;color:rgba(255,255,255,.4);background:none;border:none;padding:.8rem 1.4rem;cursor:pointer;position:relative;transition:color .15s}
+.tab-btn:hover{color:rgba(255,255,255,.8)}
+.tab-btn.active{color:var(--yellow)}
+.tab-btn.active::after{content:'';position:absolute;bottom:-3px;left:0;right:0;height:3px;background:var(--yellow)}
+.tab-pane{display:none}.tab-pane.active{display:block}
 
-  /* ── HEADER ── */
-  header {
-    background: var(--navy);
-    padding: 0 2rem;
-    display: flex;
-    align-items: stretch;
-    gap: 0;
-    position: relative;
-    overflow: hidden;
-  }
-  header::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: repeating-linear-gradient(
-      90deg,
-      transparent 0px,
-      transparent 39px,
-      rgba(255,255,255,0.03) 39px,
-      rgba(255,255,255,0.03) 40px
-    );
-  }
-  .header-accent {
-    width: 6px;
-    background: var(--yellow);
-    margin-right: 1.5rem;
-    flex-shrink: 0;
-  }
-  .header-text {
-    padding: 1.5rem 0;
-    z-index: 1;
-  }
-  .header-text h1 {
-    font-family: var(--display);
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: #fff;
-    letter-spacing: -0.02em;
-  }
-  .header-text h1 span { color: var(--yellow); }
-  .header-text p {
-    font-size: 0.8rem;
-    color: rgba(255,255,255,0.5);
-    margin-top: 0.2rem;
-    font-family: var(--mono);
-  }
-  .header-badge {
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-    z-index: 1;
-  }
-  .header-badge span {
-    background: var(--yellow);
-    color: var(--navy);
-    font-family: var(--mono);
-    font-size: 0.7rem;
-    font-weight: 500;
-    padding: 0.3rem 0.7rem;
-    border-radius: 2px;
-  }
+/* LAYOUT */
+.container{max-width:1160px;margin:0 auto;padding:1.5rem 1.5rem 3rem}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem}
+.gap{height:1rem}
 
-  /* ── TABS ── */
-  .tab-nav {
-    background: var(--navy2);
-    display: flex;
-    gap: 0;
-    padding: 0 2rem;
-    border-bottom: 3px solid var(--yellow);
-  }
-  .tab-btn {
-    font-family: var(--display);
-    font-size: 0.82rem;
-    font-weight: 700;
-    color: rgba(255,255,255,0.45);
-    background: none;
-    border: none;
-    padding: 0.8rem 1.4rem;
-    cursor: pointer;
-    letter-spacing: 0.03em;
-    position: relative;
-    transition: color 0.15s;
-  }
-  .tab-btn:hover { color: rgba(255,255,255,0.8); }
-  .tab-btn.active {
-    color: var(--yellow);
-  }
-  .tab-btn.active::after {
-    content: '';
-    position: absolute;
-    bottom: -3px; left: 0; right: 0;
-    height: 3px;
-    background: var(--yellow);
-  }
-  .tab-pane { display: none; }
-  .tab-pane.active { display: block; }
+/* CARDS */
+.card{background:#fff;border-radius:8px;border:1px solid var(--gray3);overflow:hidden}
+.ch{background:var(--navy2);padding:.6rem 1rem;display:flex;align-items:center;gap:.6rem}
+.ch .num{font-family:var(--mono);font-size:.7rem;color:var(--yellow);border:1px solid var(--yellow);width:20px;height:20px;border-radius:2px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ch h2{font-family:var(--display);font-size:.85rem;font-weight:700;color:#fff;letter-spacing:.02em}
+.ch .tag{margin-left:auto;font-family:var(--mono);font-size:.65rem;padding:.2rem .5rem;border-radius:2px;font-weight:500}
+.ti{background:var(--yellow);color:var(--navy)} .ta{background:#3b82f6;color:#fff} .tr{background:var(--green);color:#fff}
+.cb{padding:1rem}
+.ch-yellow{background:var(--yellow)}.ch-yellow h2{color:var(--navy)}.ch-yellow .num{border-color:var(--navy);color:var(--navy)}
 
-  /* ── DIMENSIONERING ── */
-  .mode-toggle {
-    display: flex;
-    gap: 0;
-    border: 1.5px solid var(--yellow);
-    border-radius: 6px;
-    overflow: hidden;
-    margin-bottom: 1.2rem;
-  }
-  .mode-btn {
-    flex: 1;
-    padding: 0.6rem 1rem;
-    font-family: var(--display);
-    font-size: 0.82rem;
-    font-weight: 700;
-    cursor: pointer;
-    border: none;
-    background: none;
-    color: var(--text2);
-    transition: background 0.15s, color 0.15s;
-    text-align: center;
-  }
-  .mode-btn.active { background: var(--yellow); color: var(--navy); }
+/* FIELDS */
+.fr{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:.5rem;padding:.42rem 0;border-bottom:1px solid var(--gray3)}
+.fr:last-child{border-bottom:none}
+.fl{font-size:.82rem;color:var(--text2)}
+.fl.b{color:var(--text);font-weight:500}
+input[type=number],input[type=text],select{font-family:var(--mono);font-size:.85rem;font-weight:500;color:var(--navy);background:var(--input-bg);border:1.5px solid var(--yellow2);border-radius:4px;padding:.3rem .5rem;width:100px;text-align:right;outline:none;transition:border-color .15s,box-shadow .15s}
+input:focus,select:focus{border-color:var(--yellow);box-shadow:0 0 0 3px rgba(246,184,36,.15)}
+select{width:auto;min-width:160px;text-align:left;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23f6b824' stroke-width='2' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .5rem center;background-color:var(--input-bg);padding-right:1.8rem}
+.av{font-family:var(--mono);font-size:.85rem;font-weight:500;color:var(--blue);background:var(--auto-bg);border:1px solid #bfdbfe;border-radius:4px;padding:.3rem .6rem;width:110px;text-align:right}
+.fu{font-family:var(--mono);font-size:.75rem;color:var(--gray4);width:55px}
 
-  .inv-card {
-    border: 1.5px solid var(--gray3);
-    border-radius: 8px;
-    padding: 1rem;
-    background: #fff;
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-  .inv-card.rank1 { border-color: var(--yellow); box-shadow: 0 0 0 3px rgba(246,184,36,0.15); }
-  .inv-card.rank2 { border-color: #93c5fd; }
-  .inv-card.rank3 { border-color: var(--gray3); }
+/* TOP BAR */
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;padding-top:.5rem}
+.topbar h3{font-family:var(--display);font-size:1rem;font-weight:700;color:var(--navy)}
+.print-btn{background:var(--navy);color:#fff;border:none;border-radius:4px;padding:.5rem 1.2rem;font-family:var(--display);font-size:.85rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:.5rem}
+.print-btn:hover{background:var(--blue)}
 
-  .inv-card .inv-name {
-    font-family: var(--display);
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--navy);
-    margin-bottom: 0.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  .rank-badge {
-    font-family: var(--mono);
-    font-size: 0.65rem;
-    padding: 0.15rem 0.45rem;
-    border-radius: 2px;
-    font-weight: 600;
-  }
-  .rank1 .rank-badge { background: var(--yellow); color: var(--navy); }
-  .rank2 .rank-badge { background: #bfdbfe; color: #1e3a8a; }
-  .rank3 .rank-badge { background: var(--gray3); color: var(--text2); }
+/* MODE TOGGLE */
+.mtog{display:flex;border:1.5px solid var(--yellow);border-radius:6px;overflow:hidden;margin-bottom:1rem}
+.mbtn{flex:1;padding:.6rem 1rem;font-family:var(--display);font-size:.8rem;font-weight:700;cursor:pointer;border:none;background:none;color:var(--text2);transition:background .15s}
+.mbtn.active{background:var(--yellow);color:var(--navy)}
 
-  .inv-stat-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.4rem 0.8rem;
-    margin: 0.6rem 0;
-  }
-  .inv-stat { font-size: 0.78rem; color: var(--text2); }
-  .inv-stat strong { color: var(--navy); font-family: var(--mono); }
+/* VLAKKEN */
+.vlak-row{display:grid;grid-template-columns:80px 1fr 110px 65px 28px;gap:.35rem;align-items:center;margin-bottom:.35rem}
+.vi{font-family:var(--mono);font-size:.78rem;padding:.3rem .4rem;border:1.5px solid var(--gray3);border-radius:4px;background:var(--input-bg);color:var(--navy);font-weight:600;width:100%;outline:none}
+.vi:focus{border-color:var(--yellow)}
+.vi.ro{background:var(--auto-bg);border-color:#bfdbfe;color:var(--blue);cursor:default}
+.vdel{background:var(--red-bg);border:none;border-radius:4px;color:var(--red);font-size:.85rem;font-weight:700;cursor:pointer;width:28px;height:28px;display:flex;align-items:center;justify-content:center}
 
-  .ratio-bar-wrap {
-    margin-top: 0.6rem;
-  }
-  .ratio-bar-label {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.72rem;
-    font-family: var(--mono);
-    color: var(--text2);
-    margin-bottom: 0.3rem;
-  }
-  .ratio-bar-track {
-    height: 8px;
-    background: var(--gray3);
-    border-radius: 4px;
-    overflow: hidden;
-    position: relative;
-  }
-  .ratio-bar-fill {
-    height: 100%;
-    border-radius: 4px;
-    transition: width 0.4s ease;
-  }
+/* VLAK MPPT TOEWIJZING */
+.vlak-mppt-badge{font-family:var(--mono);font-size:.68rem;font-weight:600;padding:.15rem .4rem;border-radius:3px;white-space:nowrap}
+.mppt-colors{--m1:#f6b824;--m2:#3b82f6;--m3:#16a34a;--m4:#a855f7}
 
-  .use-btn {
-    width: 100%;
-    margin-top: 0.8rem;
-    padding: 0.5rem;
-    font-family: var(--display);
-    font-size: 0.8rem;
-    font-weight: 700;
-    background: var(--navy);
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background 0.15s;
-    letter-spacing: 0.02em;
-  }
-  .use-btn:hover { background: var(--blue); }
+/* RESULTAAT GRID */
+.rg{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,.1)}
+.ri{background:var(--navy2);padding:1rem;display:flex;flex-direction:column;gap:.3rem}
+.ri.hl{background:rgba(246,184,36,.12);border:1px solid rgba(246,184,36,.3)}
+.ri label{font-size:.72rem;color:rgba(255,255,255,.5);font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em}
+.ri .val{font-family:var(--display);font-size:1.5rem;font-weight:800;color:#fff;line-height:1}
+.ri.hl .val{color:var(--yellow)}
+.ri .sub{font-size:.72rem;color:rgba(255,255,255,.4);font-family:var(--mono)}
 
-  .dim-summary {
-    background: var(--navy);
-    border-radius: 8px;
-    padding: 1.2rem;
-    color: #fff;
-    margin-bottom: 1rem;
-  }
-  .dim-summary h3 {
-    font-family: var(--display);
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: var(--yellow);
-    margin-bottom: 0.8rem;
-  }
-  .dim-sum-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0.8rem;
-  }
-  .dim-sum-item label {
-    font-size: 0.68rem;
-    font-family: var(--mono);
-    color: rgba(255,255,255,0.5);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    display: block;
-    margin-bottom: 0.2rem;
-  }
-  .dim-sum-item .dsval {
-    font-family: var(--display);
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #fff;
-  }
+/* PER-VLAK STRING RESULTAAT */
+.vlak-result-card{border-radius:6px;border:1.5px solid;padding:.8rem 1rem;margin-bottom:.6rem}
+.vlak-result-card.ok{background:var(--green-bg);border-color:#86efac}
+.vlak-result-card.warn{background:#fef9c3;border-color:#fde047}
+.vlak-result-card.err{background:var(--red-bg);border-color:#fca5a5}
+.vlak-result-card.vmin{background:var(--purple-bg);border-color:#c4b5fd}
+.vr-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem}
+.vr-name{font-family:var(--display);font-size:.9rem;font-weight:700;color:var(--navy)}
+.vr-badge{font-family:var(--mono);font-size:.72rem;font-weight:600;padding:.2rem .5rem;border-radius:3px}
+.vr-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem}
+.vr-stat{font-size:.75rem;color:var(--text2)} .vr-stat strong{color:var(--navy);font-family:var(--mono)}
 
-  /* ── LAYOUT ── */
-  .container {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 1.5rem 1.5rem 3rem;
-  }
+/* KABEL RESULTAAT */
+.kr{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+.kb{border-radius:6px;padding:.8rem 1rem;border:1.5px solid}
+.kb.g{background:var(--green-bg);border-color:#86efac}
+.kb.o{background:#fef9c3;border-color:#fde047}
+.kb.r{background:var(--red-bg);border-color:#fca5a5}
+.kb label{font-size:.7rem;color:var(--text2);font-family:var(--mono);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:.3rem}
+.kb .kv{font-family:var(--display);font-size:1.3rem;font-weight:700;color:var(--navy)}
+.kb .ks{font-size:.72rem;color:var(--text2);font-family:var(--mono);margin-top:.2rem}
 
-  .grid-2 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-  }
-  .grid-3 {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 1rem;
-  }
-  .col-full { grid-column: 1 / -1; }
+/* WAARSCHUWING */
+.wb{border-radius:6px;padding:.7rem 1rem;font-size:.82rem;display:flex;gap:.5rem;align-items:flex-start;margin-top:.6rem}
+.wb.ok{background:var(--green-bg);border:1.5px solid #86efac;color:#14532d}
+.wb.warn{background:#fef9c3;border:1.5px solid #fde047;color:#713f12}
+.wb.err{background:var(--red-bg);border:1.5px solid #fca5a5;color:#7f1d1d}
 
-  /* ── CARDS ── */
-  .card {
-    background: #fff;
-    border-radius: 8px;
-    border: 1px solid var(--gray3);
-    overflow: hidden;
-  }
-  .card-header {
-    background: var(--navy2);
-    padding: 0.6rem 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-  }
-  .card-header .num {
-    font-family: var(--mono);
-    font-size: 0.7rem;
-    color: var(--yellow);
-    font-weight: 500;
-    border: 1px solid var(--yellow);
-    width: 20px; height: 20px;
-    border-radius: 2px;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
-  .card-header h2 {
-    font-family: var(--display);
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: #fff;
-    letter-spacing: 0.02em;
-  }
-  .card-header .tag {
-    margin-left: auto;
-    font-family: var(--mono);
-    font-size: 0.65rem;
-    padding: 0.2rem 0.5rem;
-    border-radius: 2px;
-    font-weight: 500;
-  }
-  .tag-input  { background: var(--yellow); color: var(--navy); }
-  .tag-auto   { background: var(--sky); color: #fff; }
-  .tag-result { background: var(--green); color: #fff; }
-  .card-body { padding: 1rem; }
+/* TABEL */
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:.78rem}
+th{background:var(--navy);color:rgba(255,255,255,.8);padding:.5rem .6rem;text-align:center;font-weight:500;white-space:nowrap;border:1px solid rgba(255,255,255,.1)}
+th.corner{background:#0a1628}
+td{padding:.4rem .6rem;text-align:center;border:1px solid var(--gray3);font-weight:500}
+tr:nth-child(even) td{background:var(--gray1)}
+td.rh{background:var(--navy2);color:rgba(255,255,255,.8);font-weight:500;border-color:rgba(255,255,255,.1);white-space:nowrap}
+td.c4{background:var(--green-bg);color:#14532d}
+td.c6{background:#fef9c3;color:#713f12}
+td.c10{background:#ffedd5;color:#7c2d12}
+td.err{background:var(--red-bg);color:#7f1d1d}
+td.vmin{background:var(--purple-bg);color:#4c1d95}
+td.ac{outline:2px solid var(--yellow);outline-offset:-2px}
 
-  /* ── FIELD ROWS ── */
-  .field-row {
-    display: grid;
-    grid-template-columns: 1fr auto auto;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.45rem 0;
-    border-bottom: 1px solid var(--gray3);
-  }
-  .field-row:last-child { border-bottom: none; }
-  .field-label {
-    font-size: 0.82rem;
-    color: var(--text2);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .field-label.bold { color: var(--text); font-weight: 500; }
+/* LEGENDA */
+.leg{display:flex;gap:.8rem;flex-wrap:wrap;margin-top:.8rem}
+.leg-i{display:flex;align-items:center;gap:.4rem;font-size:.75rem;color:var(--text2);font-family:var(--mono)}
+.leg-d{width:12px;height:12px;border-radius:2px;flex-shrink:0}
 
-  input[type=number], input[type=text], select {
-    font-family: var(--mono);
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--navy);
-    background: var(--input-bg);
-    border: 1.5px solid var(--yellow2);
-    border-radius: 4px;
-    padding: 0.3rem 0.5rem;
-    width: 100px;
-    text-align: right;
-    outline: none;
-    transition: border-color 0.15s, box-shadow 0.15s;
-  }
-  input:focus, select:focus {
-    border-color: var(--yellow);
-    box-shadow: 0 0 0 3px rgba(246,184,36,0.15);
-  }
-  select {
-    width: auto;
-    min-width: 220px;
-    text-align: left;
-    cursor: pointer;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23f6b824' stroke-width='2' fill='none'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 0.5rem center;
-    padding-right: 1.8rem;
-    appearance: none;
-  }
+/* DIM SUMMARY */
+.ds{background:var(--navy);border-radius:8px;padding:1.2rem;color:#fff;margin-bottom:1rem}
+.ds h3{font-family:var(--display);font-size:.9rem;font-weight:700;color:var(--yellow);margin-bottom:.8rem}
+.dsg{display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem}
+.dsi label{font-size:.68rem;font-family:var(--mono);color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:.2rem}
+.dsi .dv{font-family:var(--display);font-size:1.1rem;font-weight:700;color:#fff}
+.dvlak-row{display:flex;justify-content:space-between;align-items:center;padding:.3rem 0;border-bottom:1px solid rgba(255,255,255,.06);font-family:var(--mono);font-size:.75rem}
 
-  .auto-val {
-    font-family: var(--mono);
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--blue);
-    background: var(--auto-bg);
-    border: 1px solid #bfdbfe;
-    border-radius: 4px;
-    padding: 0.3rem 0.6rem;
-    width: 100px;
-    text-align: right;
-    min-width: 90px;
-  }
+/* INV CARDS */
+.ic{border:1.5px solid var(--gray3);border-radius:8px;padding:1rem;background:#fff;margin-bottom:.8rem;transition:border-color .2s,box-shadow .2s}
+.ic.r1{border-color:var(--yellow);box-shadow:0 0 0 3px rgba(246,184,36,.15)}
+.ic.r2{border-color:#93c5fd}
+.iname{font-family:var(--display);font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem}
+.rbadge{font-family:var(--mono);font-size:.65rem;padding:.15rem .45rem;border-radius:2px;font-weight:600}
+.r1 .rbadge{background:var(--yellow);color:var(--navy)}.r2 .rbadge{background:#bfdbfe;color:#1e3a8a}.r3 .rbadge{background:var(--gray3);color:var(--text2)}
+.isg{display:grid;grid-template-columns:1fr 1fr;gap:.4rem .8rem;margin:.6rem 0}
+.is{font-size:.78rem;color:var(--text2)}.is strong{color:var(--navy);font-family:var(--mono)}
+.rb-wrap{margin-top:.6rem}
+.rb-lbl{display:flex;justify-content:space-between;font-size:.72rem;font-family:var(--mono);color:var(--text2);margin-bottom:.3rem}
+.rb-track{height:8px;background:var(--gray3);border-radius:4px;overflow:hidden}
+.rb-fill{height:100%;border-radius:4px;transition:width .4s}
+.use-btn{width:100%;margin-top:.8rem;padding:.5rem;font-family:var(--display);font-size:.8rem;font-weight:700;background:var(--navy);color:#fff;border:none;border-radius:4px;cursor:pointer;transition:background .15s;letter-spacing:.02em}
+.use-btn:hover{background:var(--blue)}
 
-  .field-unit {
-    font-family: var(--mono);
-    font-size: 0.75rem;
-    color: var(--gray4);
-    width: 50px;
-  }
+/* OMVORMER SELECT */
+.inv-sel{display:flex;gap:.8rem;align-items:center;padding:.8rem 0 1rem;flex-wrap:wrap}
+.inv-sel label{font-family:var(--display);font-size:.9rem;font-weight:600;color:var(--navy)}
 
-  /* ── OMVORMER DROPDOWN ── */
-  .inv-select-wrap {
-    display: flex;
-    gap: 0.8rem;
-    align-items: center;
-    padding: 0.8rem 0 1rem;
-    flex-wrap: wrap;
-  }
-  .inv-select-wrap label {
-    font-family: var(--display);
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--navy);
-  }
+/* STRING INVOER */
+.string-section{background:var(--navy);border-radius:6px;padding:.8rem 1rem;margin-bottom:.8rem}
+.string-section h4{font-family:var(--display);font-size:.8rem;font-weight:700;color:var(--yellow);margin-bottom:.6rem;letter-spacing:.03em}
+.sr{display:grid;grid-template-columns:120px 80px 1fr auto;align-items:center;gap:.5rem;padding:.4rem 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.sr:last-child{border-bottom:none}
+.sl{font-family:var(--mono);font-size:.75rem;color:rgba(255,255,255,.7)}
+.si{font-family:var(--mono);font-size:.9rem;font-weight:700;color:var(--navy);background:var(--input-bg);border:1.5px solid var(--yellow2);border-radius:4px;padding:.3rem .5rem;width:65px;text-align:center;outline:none}
+.si:focus{border-color:var(--yellow);box-shadow:0 0 0 3px rgba(246,184,36,.2)}
+.sd{font-family:var(--mono);font-size:.68rem;color:rgba(255,255,255,.45);white-space:nowrap}
+.sbadge{font-family:var(--mono);font-size:.7rem;font-weight:600;padding:.2rem .5rem;border-radius:3px;white-space:nowrap;min-width:80px;text-align:center}
+.sb-ok{background:#dcfce7;color:#14532d}.sb-warn{background:#fef9c3;color:#713f12}
+.sb-err{background:#fee2e2;color:#7f1d1d}.sb-vmin{background:var(--purple-bg);color:#4c1d95}.sb-empty{background:rgba(255,255,255,.1);color:rgba(255,255,255,.3)}
+.str-totaal{font-size:.72rem;color:rgba(255,255,255,.4);font-family:var(--mono);margin-top:.6rem}
 
-  /* ── RESULT BLOK ── */
-  .result-card {
-    background: var(--navy);
-    border-radius: 8px;
-    overflow: hidden;
-    border: none;
-  }
-  .result-card .card-header { background: var(--yellow); }
-  .result-card .card-header h2 { color: var(--navy); }
-  .result-card .card-header .num { border-color: var(--navy); color: var(--navy); }
+/* DCAC BOX */
+.dcac-box{border-radius:6px;border:1.5px solid;padding:.8rem 1rem}
+.dcac-box label{font-size:.7rem;font-family:var(--mono);color:var(--text2);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:.3rem}
+.dcac-box .kv{font-family:var(--display);font-size:1.3rem;font-weight:700}
+.dcac-box .ks{font-size:.72rem;font-family:var(--mono);color:var(--text2);margin-top:.2rem}
 
-  .result-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1px;
-    background: rgba(255,255,255,0.1);
-  }
-  .result-item {
-    background: var(--navy2);
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-  }
-  .result-item.highlight {
-    background: rgba(246,184,36,0.12);
-    border: 1px solid rgba(246,184,36,0.3);
-  }
-  .result-item label {
-    font-size: 0.72rem;
-    color: rgba(255,255,255,0.5);
-    font-family: var(--mono);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-  .result-item .val {
-    font-family: var(--display);
-    font-size: 1.6rem;
-    font-weight: 800;
-    color: #fff;
-    line-height: 1;
-  }
-  .result-item.highlight .val { color: var(--yellow); }
-  .result-item .sub {
-    font-size: 0.72rem;
-    color: rgba(255,255,255,0.4);
-    font-family: var(--mono);
-  }
-
-  /* ── KABEL RESULTAAT ── */
-  .kabel-result {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    margin-top: 0;
-  }
-  .kabel-box {
-    border-radius: 6px;
-    padding: 0.8rem 1rem;
-    border: 1.5px solid;
-  }
-  .kabel-box.green  { background: var(--green-bg);  border-color: #86efac; }
-  .kabel-box.orange { background: var(--orange-bg); border-color: #fdba74; }
-  .kabel-box.red    { background: var(--red-bg);    border-color: #fca5a5; }
-  .kabel-box label  {
-    font-size: 0.72rem;
-    color: var(--text2);
-    font-family: var(--mono);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    display: block;
-    margin-bottom: 0.3rem;
-  }
-  .kabel-box .kval {
-    font-family: var(--display);
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: var(--navy);
-  }
-  .kabel-box .ksub {
-    font-size: 0.75rem;
-    color: var(--text2);
-    font-family: var(--mono);
-    margin-top: 0.2rem;
-  }
-
-  /* ── WAARSCHUWING ── */
-  .warning-box {
-    background: #fffbeb;
-    border: 1.5px solid var(--yellow);
-    border-radius: 6px;
-    padding: 0.7rem 1rem;
-    font-size: 0.82rem;
-    color: #92400e;
-    display: flex;
-    gap: 0.5rem;
-    align-items: flex-start;
-    margin-top: 0.8rem;
-  }
-  .warning-box.error {
-    background: var(--red-bg);
-    border-color: var(--red);
-    color: #7f1d1d;
-  }
-  .warning-box.ok {
-    background: var(--green-bg);
-    border-color: #86efac;
-    color: #14532d;
-  }
-
-  /* ── OVERZICHTSTABEL ── */
-  .tabel-card { margin-top: 1rem; }
-  .tabel-wrap { overflow-x: auto; }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-family: var(--mono);
-    font-size: 0.78rem;
-  }
-  th {
-    background: var(--navy);
-    color: rgba(255,255,255,0.8);
-    padding: 0.5rem 0.6rem;
-    text-align: center;
-    font-weight: 500;
-    white-space: nowrap;
-    border: 1px solid rgba(255,255,255,0.1);
-  }
-  th.corner { background: #0a1628; }
-  td {
-    padding: 0.4rem 0.6rem;
-    text-align: center;
-    border: 1px solid var(--gray3);
-    font-weight: 500;
-  }
-  tr:nth-child(even) td { background: var(--gray1); }
-  td.row-header {
-    background: var(--navy2);
-    color: rgba(255,255,255,0.8);
-    font-weight: 500;
-    border-color: rgba(255,255,255,0.1);
-    white-space: nowrap;
-  }
-  td.c4   { background: var(--green-bg);   color: #14532d; }
-  td.c6   { background: #fef9c3;            color: #713f12; }
-  td.c10  { background: var(--orange-bg);   color: #7c2d12; }
-  td.err  { background: var(--red-bg);      color: #7f1d1d; }
-  td.vmin { background: var(--purple-bg);   color: #4c1d95; }
-  td.active-col { outline: 2px solid var(--yellow); outline-offset: -2px; }
-
-  /* ── LEGENDA ── */
-  .legenda {
-    display: flex;
-    gap: 0.8rem;
-    flex-wrap: wrap;
-    margin-top: 0.8rem;
-  }
-  .leg-item {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-size: 0.75rem;
-    color: var(--text2);
-    font-family: var(--mono);
-  }
-  .leg-dot {
-    width: 12px; height: 12px;
-    border-radius: 2px;
-    flex-shrink: 0;
-  }
-
-  /* ── PRINT ── */
-  .print-btn {
-    background: var(--navy);
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    padding: 0.5rem 1.2rem;
-    font-family: var(--display);
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: background 0.15s;
-  }
-  .print-btn:hover { background: var(--blue); }
-
-  .top-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-    padding-top: 0.5rem;
-  }
-  .top-bar h3 {
-    font-family: var(--display);
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--navy);
-  }
-
-  /* ── STRING INVOER ── */
-  .string-row {
-    display: grid;
-    grid-template-columns: auto 1fr auto auto;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.4rem 0;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-  }
-  .string-row:last-child { border-bottom: none; }
-  .string-label {
-    font-family: var(--mono);
-    font-size: 0.75rem;
-    color: rgba(255,255,255,0.6);
-    white-space: nowrap;
-    min-width: 80px;
-  }
-  .string-input {
-    font-family: var(--mono);
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: var(--navy);
-    background: var(--input-bg);
-    border: 1.5px solid var(--yellow2);
-    border-radius: 4px;
-    padding: 0.3rem 0.5rem;
-    width: 70px;
-    text-align: center;
-  }
-  .string-input:focus {
-    border-color: var(--yellow);
-    box-shadow: 0 0 0 3px rgba(246,184,36,0.2);
-    outline: none;
-  }
-  .string-badge {
-    font-family: var(--mono);
-    font-size: 0.7rem;
-    font-weight: 600;
-    padding: 0.2rem 0.5rem;
-    border-radius: 3px;
-    white-space: nowrap;
-    min-width: 70px;
-    text-align: center;
-  }
-  .badge-ok     { background: #dcfce7; color: #14532d; }
-  .badge-warn   { background: #fef9c3; color: #713f12; }
-  .badge-err    { background: #fee2e2; color: #7f1d1d; }
-  .badge-vmin   { background: #ede9fe; color: #4c1d95; }
-  .badge-empty  { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.3); }
-
-  .string-detail {
-    font-family: var(--mono);
-    font-size: 0.68rem;
-    color: rgba(255,255,255,0.45);
-    white-space: nowrap;
-  }
-
-  /* ── SPACER ── */
-  .gap { height: 1rem; }
-
-  @media print {
-    body { background: #fff; }
-    .print-btn { display: none; }
-    .container { padding: 0; }
-    header { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
-  }
-
-  @media (max-width: 700px) {
-    .grid-2, .grid-3 { grid-template-columns: 1fr; }
-    .result-grid { grid-template-columns: 1fr 1fr; }
-    .kabel-result { grid-template-columns: 1fr; }
-  }
+@media print{body{background:#fff}.print-btn{display:none}.container{padding:0}header{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
+@media(max-width:700px){.grid2,.grid3{grid-template-columns:1fr}.rg{grid-template-columns:1fr 1fr}.kr{grid-template-columns:1fr}.vlak-row{grid-template-columns:1fr 1fr 70px 50px 28px}.dsg{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
 
 <header>
-  <div class="header-accent"></div>
-  <div class="header-text">
+  <div class="ha"></div>
+  <div class="ht">
     <h1>PV <span>String</span> Calculator</h1>
-    <p>Huawei SUN2000 · NEN 1010 / IEC 60364</p>
+    <p>Huawei SUN2000 · NEN 1010 / IEC 60364 · Per dakvlak</p>
   </div>
-  <div class="header-badge"><span>KlimaatWatt</span></div>
+  <div class="hb"><span>KlimaatWatt</span></div>
 </header>
 
 <nav class="tab-nav">
-  <button class="tab-btn active" onclick="switchTab('dim')">☀ Dimensionering</button>
-  <button class="tab-btn" onclick="switchTab('calc')">⚡ String Calculator</button>
+  <button class="tab-btn active" id="tbDim" onclick="switchTab('dim',this)">☀ Dimensionering</button>
+  <button class="tab-btn" id="tbCalc" onclick="switchTab('calc',this)">⚡ String Calculator</button>
 </nav>
 
-<!-- ══════════════ TAB: DIMENSIONERING ══════════════ -->
+<!-- ════════════════ TAB DIMENSIONERING ════════════════ -->
 <div class="tab-pane active" id="tab-dim">
 <div class="container">
-
-  <div class="top-bar">
-    <h3>Stap 1 — Bepaal het gewenste systeem</h3>
+  <div class="topbar">
+    <h3>Stap 1 — Dakvlakken & systeemopmaak</h3>
     <button class="print-btn" onclick="window.print()">
       <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>
       Afdrukken
     </button>
   </div>
 
-  <div class="grid-2">
-
-    <!-- INVOER -->
+  <div class="grid2">
+    <!-- LINKER KOLOM: INVOER -->
     <div>
+      <!-- DAKVLAKKEN -->
       <div class="card">
-        <div class="card-header">
-          <div class="num">A</div>
-          <h2>UITGANGSPUNT</h2>
-          <span class="tag tag-input">kies modus</span>
-        </div>
-        <div class="card-body">
-          <div class="mode-toggle">
-            <button class="mode-btn active" id="modeKwhBtn" onclick="setMode('kwh')">📊 Gewenste productie (kWh)</button>
-            <button class="mode-btn" id="modePanBtn" onclick="setMode('pan')">🔲 Aantal panelen / oppervlakte</button>
+        <div class="ch"><div class="num">A</div><h2>DAKVLAKKEN</h2><span class="tag ti">invoer per vlak</span></div>
+        <div class="cb">
+          <div class="mtog">
+            <button class="mbtn active" id="modeKwhBtn" onclick="setMode('kwh')">📊 Gewenste productie (kWh/j)</button>
+            <button class="mbtn" id="modePanBtn" onclick="setMode('pan')">🔲 Panelen per vlak</button>
           </div>
-
-          <!-- Modus A: kWh -->
           <div id="inputKwh">
-            <div class="field-row">
-              <span class="field-label bold">Gewenste jaarproductie</span>
+            <div class="fr">
+              <span class="fl b">Gewenste jaarproductie</span>
               <input type="number" id="d_kwh" value="5000" step="100" min="100" oninput="calcDim()">
-              <span class="field-unit">kWh/j</span>
+              <span class="fu">kWh/j</span>
             </div>
           </div>
 
-          <!-- Modus B: panelen -->
-          <div id="inputPan" style="display:none">
-            <div class="field-row">
-              <span class="field-label bold">Aantal beschikbare panelen</span>
-              <input type="number" id="d_npan" value="12" step="1" min="1" oninput="calcDim()">
-              <span class="field-unit">st</span>
-            </div>
+          <!-- tabelkop -->
+          <div style="display:grid;grid-template-columns:80px 1fr 110px 65px 28px;gap:.35rem;margin:.8rem 0 .3rem">
+            <span style="font-size:.7rem;font-family:var(--mono);color:var(--text2);font-weight:600">NAAM</span>
+            <span style="font-size:.7rem;font-family:var(--mono);color:var(--text2);font-weight:600">ORIËNTATIE</span>
+            <span style="font-size:.7rem;font-family:var(--mono);color:var(--text2);font-weight:600;text-align:center">HELLING</span>
+            <span style="font-size:.7rem;font-family:var(--mono);color:var(--text2);font-weight:600;text-align:center" id="pan_col_hdr">PANELEN</span>
+            <span></span>
           </div>
+          <div id="vlakken_list"></div>
 
-          <div class="field-row" style="margin-top:0.3rem">
-            <span class="field-label bold">Oriëntatie dak</span>
-            <select id="d_orient" onchange="calcDim()" style="min-width:140px">
-              <option value="950">Zuid (950 kWh/kWp)</option>
-              <option value="900" selected>Zuid-West / Zuid-Oost (900 kWh/kWp)</option>
-              <option value="800">West / Oost (800 kWh/kWp)</option>
-              <option value="700">Noord-West / Noord-Oost (700 kWh/kWp)</option>
-            </select>
-            <span class="field-unit"></span>
-          </div>
+          <button onclick="addVlak()" style="background:none;border:1.5px dashed var(--gray3);border-radius:6px;width:100%;padding:.5rem;font-family:var(--display);font-size:.8rem;font-weight:600;color:var(--text2);cursor:pointer;margin:.5rem 0 1rem;transition:all .15s" onmouseover="this.style.borderColor='var(--yellow)';this.style.color='var(--navy)'" onmouseout="this.style.borderColor='var(--gray3)';this.style.color='var(--text2)'">
+            + Dakvlak toevoegen
+          </button>
 
-          <div class="field-row">
-            <span class="field-label">Systeemrendement (kabel, omv., vuil)</span>
+          <div class="fr">
+            <span class="fl">Systeemrendement (kabel, omv., vuil)</span>
             <input type="number" id="d_eff" value="82" step="1" min="50" max="99" oninput="calcDim()">
-            <span class="field-unit">%</span>
+            <span class="fu">%</span>
           </div>
         </div>
       </div>
 
       <div class="gap"></div>
 
+      <!-- PANEEL -->
       <div class="card">
-        <div class="card-header">
-          <div class="num">B</div>
-          <h2>PANEEL GEGEVENS</h2>
-          <span class="tag tag-input">invoer</span>
-        </div>
-        <div class="card-body">
-          <div class="field-row">
-            <span class="field-label bold">Type paneel</span>
-            <input type="text" id="d_pnaam" value="TSM-445 NEG9R.28" style="width:160px;text-align:left" oninput="calcDim()">
-            <span class="field-unit"></span>
-          </div>
-          <div class="field-row">
-            <span class="field-label">Pmax per paneel</span>
-            <input type="number" id="d_pmax" value="445" step="5" oninput="calcDim()">
-            <span class="field-unit">Wp</span>
-          </div>
-          <div class="field-row">
-            <span class="field-label">Fase voorkeur</span>
-            <select id="d_fase_pref" onchange="calcDim()" style="min-width:140px">
+        <div class="ch"><div class="num">B</div><h2>PANEEL GEGEVENS</h2><span class="tag ti">invoer</span></div>
+        <div class="cb">
+          <div class="fr"><span class="fl b">Type paneel</span><input type="text" id="d_pnaam" value="TSM-445 NEG9R.28" style="width:160px;text-align:left" oninput="calcDim()"><span class="fu"></span></div>
+          <div class="fr"><span class="fl">Pmax per paneel</span><input type="number" id="d_pmax" value="445" step="5" oninput="calcDim()"><span class="fu">Wp</span></div>
+          <div class="fr"><span class="fl">Fase voorkeur</span>
+            <select id="d_fase_pref" onchange="calcDim()">
               <option value="both">Geen voorkeur</option>
               <option value="1-fase">1-fase</option>
               <option value="3-fase">3-fase</option>
             </select>
-            <span class="field-unit"></span>
+            <span class="fu"></span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- SAMENVATTING BEREKENING -->
+    <!-- RECHTER KOLOM: RESULTATEN -->
     <div>
-      <div id="dim-summary-box" class="dim-summary">
-        <h3>Berekend systeemoverzicht</h3>
-        <div class="dim-sum-grid">
-          <div class="dim-sum-item"><label>Benodigde kWp</label><div class="dsval" id="ds_kwp">—</div></div>
-          <div class="dim-sum-item"><label>Aantal panelen</label><div class="dsval" id="ds_npan">—</div></div>
-          <div class="dim-sum-item"><label>Totaal PV</label><div class="dsval" id="ds_totpv">—</div></div>
-          <div class="dim-sum-item"><label>Verwachte productie</label><div class="dsval" id="ds_prod">—</div></div>
+      <div class="ds" id="dim-summary">
+        <h3>Systeemoverzicht</h3>
+        <div class="dsg">
+          <div class="dsi"><label>Totaal panelen</label><div class="dv" id="ds_npan">—</div></div>
+          <div class="dsi"><label>Totaal PV</label><div class="dv" id="ds_totpv">—</div></div>
+          <div class="dsi"><label>Verwachte productie</label><div class="dv" id="ds_prod">—</div></div>
+          <div class="dsi"><label id="ds_kwp_lbl">Spec. opbrengst</label><div class="dv" id="ds_kwp">—</div></div>
         </div>
+        <div id="ds_vlakken" style="margin-top:.8rem;border-top:1px solid rgba(255,255,255,.1);padding-top:.8rem"></div>
       </div>
 
       <div class="card">
-        <div class="card-header">
-          <div class="num">C</div>
-          <h2>AANBEVOLEN OMVORMERS</h2>
-          <span class="tag tag-result">resultaat</span>
+        <div class="ch"><div class="num">C</div><h2>MPPT-TOEWIJZING</h2><span class="tag ta">automatisch</span></div>
+        <div class="cb" id="mppt_toewijzing">
+          <p style="color:var(--text2);font-size:.85rem">Voeg dakvlakken toe om de MPPT-toewijzing te zien.</p>
         </div>
-        <div class="card-body" id="inv-recommendations">
-          <p style="color:var(--text2);font-size:0.85rem">Vul de gegevens links in om omvormers te zien.</p>
+      </div>
+
+      <div class="gap"></div>
+
+      <div class="card">
+        <div class="ch"><div class="num">D</div><h2>AANBEVOLEN OMVORMERS</h2><span class="tag tr">resultaat</span></div>
+        <div class="cb" id="inv-recommendations">
+          <p style="color:var(--text2);font-size:.85rem">Vul gegevens in om omvormers te zien.</p>
         </div>
       </div>
     </div>
-
   </div>
 </div>
 </div><!-- /tab-dim -->
 
-<!-- ══════════════ TAB: STRING CALCULATOR ══════════════ -->
+<!-- ════════════════ TAB STRING CALCULATOR ════════════════ -->
 <div class="tab-pane" id="tab-calc">
 <div class="container">
-
-  <div class="top-bar">
-    <h3>Stringberekening · Kabelsectie · DC-kabellengte</h3>
+  <div class="topbar">
+    <h3>Stap 2 — Stringberekening per dakvlak</h3>
     <button class="print-btn" onclick="window.print()">
       <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>
       Afdrukken / PDF
     </button>
   </div>
 
-  <!-- ══ OMVORMER ══ -->
-  <div class="card">
-    <div class="card-header">
-      <div class="num">1</div>
-      <h2>OMVORMER SELECTIE</h2>
-      <span class="tag tag-input">invoer</span>
-    </div>
-    <div class="card-body">
-      <div class="inv-select-wrap">
-        <label>Type:</label>
-        <select id="invSelect" onchange="calc()">
-          <optgroup label="── SUN2000 KTL-L1 (1-fase, Vmax 600V) ──">
-            <option value="2KTL-L1">SUN2000-2KTL-L1</option>
-            <option value="3KTL-L1">SUN2000-3KTL-L1</option>
-            <option value="3.68KTL-L1">SUN2000-3.68KTL-L1</option>
-            <option value="4KTL-L1">SUN2000-4KTL-L1</option>
-            <option value="4.6KTL-L1">SUN2000-4.6KTL-L1</option>
-            <option value="5KTL-L1">SUN2000-5KTL-L1</option>
-            <option value="6KTL-L1">SUN2000-6KTL-L1</option>
-          </optgroup>
-          <optgroup label="── SUN2000 KTL-M1 (3-fase, Vmax 1100V) ──">
-            <option value="3KTL-M1">SUN2000-3KTL-M1</option>
-            <option value="4KTL-M1">SUN2000-4KTL-M1</option>
-            <option value="5KTL-M1" selected>SUN2000-5KTL-M1</option>
-            <option value="6KTL-M1">SUN2000-6KTL-M1</option>
-            <option value="8KTL-M1">SUN2000-8KTL-M1</option>
-            <option value="10KTL-M1">SUN2000-10KTL-M1</option>
-          </optgroup>
-          <optgroup label="── SUN2000 K-LB0 (1-fase, Vmax 600V, nieuw) ──">
-            <option value="3K-LB0">SUN2000-3K-LB0</option>
-            <option value="3.68K-LB0">SUN2000-3.68K-LB0</option>
-            <option value="4K-LB0">SUN2000-4K-LB0</option>
-            <option value="4.6K-LB0">SUN2000-4.6K-LB0</option>
-            <option value="5K-LB0">SUN2000-5K-LB0</option>
-            <option value="6K-LB0">SUN2000-6K-LB0</option>
-          </optgroup>
-        </select>
-      </div>
-      <div class="grid-3">
-        <div class="field-row"><span class="field-label">Max. ingangsspanning Vmax</span><span class="auto-val" id="d_vmax">—</span><span class="field-unit">V</span></div>
-        <div class="field-row"><span class="field-label">MPPT bereik</span><span class="auto-val" id="d_mppt">—</span><span class="field-unit">V</span></div>
-        <div class="field-row"><span class="field-label">Max. Isc per MPPT</span><span class="auto-val" id="d_isc">—</span><span class="field-unit">A</span></div>
-        <div class="field-row"><span class="field-label">Fase</span><span class="auto-val" id="d_fase">—</span><span class="field-unit"></span></div>
-        <div class="field-row"><span class="field-label">Aant. MPPT-trackers</span><span class="auto-val" id="d_nmppt">—</span><span class="field-unit"></span></div>
-        <div class="field-row"><span class="field-label">Max. Imax per MPPT</span><span class="auto-val" id="d_imax">—</span><span class="field-unit">A</span></div>
-        <div class="field-row"><span class="field-label">Nominaal AC vermogen</span><span class="auto-val" id="d_pnom">—</span><span class="field-unit">W</span></div>
-        <div class="field-row"><span class="field-label">Aanbevolen max. PV</span><span class="auto-val" id="d_recpv">—</span><span class="field-unit">Wp</span></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="gap"></div>
-
-  <!-- ══ PANEEL + KABEL ══ -->
-  <div class="grid-2">
-
-    <div class="card">
-      <div class="card-header">
-        <div class="num">2</div>
-        <h2>PANEEL GEGEVENS (STC)</h2>
-        <span class="tag tag-input">invoer</span>
-      </div>
-      <div class="card-body">
-        <div class="field-row">
-          <span class="field-label bold">Type paneel</span>
-          <input type="text" id="p_naam" value="TSM-445 NEG9R.28" style="width:160px;text-align:left" oninput="calc()">
-          <span class="field-unit"></span>
-        </div>
-        <div class="field-row">
-          <span class="field-label">Pmax</span>
-          <input type="number" id="p_pmax" value="445" oninput="calc()">
-          <span class="field-unit">Wp</span>
-        </div>
-        <div class="field-row">
-          <span class="field-label">Voc (STC)</span>
-          <input type="number" id="p_voc" value="52.6" step="0.1" oninput="calc()">
-          <span class="field-unit">V</span>
-        </div>
-        <div class="field-row">
-          <span class="field-label">Vmpp</span>
-          <input type="number" id="p_vmpp" value="44.3" step="0.1" oninput="calc()">
-          <span class="field-unit">V</span>
-        </div>
-        <div class="field-row">
-          <span class="field-label">Isc</span>
-          <input type="number" id="p_isc" value="10.05" step="0.01" oninput="calc()">
-          <span class="field-unit">A</span>
-        </div>
-        <div class="field-row">
-          <span class="field-label">Impp</span>
-          <input type="number" id="p_impp" value="10.71" step="0.01" oninput="calc()">
-          <span class="field-unit">A</span>
-        </div>
-        <div class="field-row">
-          <span class="field-label">Temp.coëff. Voc</span>
-          <input type="number" id="p_tvoc" value="-0.24" step="0.01" oninput="calc()">
-          <span class="field-unit">%/°C</span>
-        </div>
-        <div class="field-row">
-          <span class="field-label">Min. ontwerptemp.</span>
-          <input type="number" id="p_tmin" value="-10" step="1" oninput="calc()">
-          <span class="field-unit">°C</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <div class="num">3</div>
-        <h2>STRINGVERDELING</h2>
-        <span class="tag tag-input">invoer</span>
-      </div>
-      <div class="card-body">
-
-        <div class="field-row" style="margin-bottom:0.5rem">
-          <span class="field-label bold">Kabellengte (één richting)</span>
-          <input type="number" id="k_len" value="20" step="1" min="1" oninput="calc()">
-          <span class="field-unit">m</span>
-        </div>
-        <div class="field-row">
-          <span class="field-label bold">Max. spanningsverlies</span>
-          <input type="number" id="k_pct" value="1.0" step="0.1" min="0.1" max="5" oninput="calc()">
-          <span class="field-unit">%</span>
-        </div>
-        <div class="field-row" style="margin-bottom:1rem">
-          <span class="field-label">Soortelijke weerstand ρ (koper)</span>
-          <input type="number" id="k_rho" value="0.0175" step="0.0001" oninput="calc()">
-          <span class="field-unit">Ω·mm²/m</span>
-        </div>
-
-        <div style="background:var(--navy);border-radius:6px;padding:0.8rem 1rem;margin-bottom:0.8rem">
-          <div style="font-family:var(--display);font-size:0.8rem;font-weight:700;color:var(--yellow);margin-bottom:0.6rem;letter-spacing:0.03em">
-            STRINGVERDELING PER MPPT
+  <div class="grid2">
+    <!-- LINKER KOLOM -->
+    <div>
+      <!-- OMVORMER -->
+      <div class="card">
+        <div class="ch"><div class="num">1</div><h2>OMVORMER</h2><span class="tag ti">invoer</span></div>
+        <div class="cb">
+          <div class="inv-sel">
+            <label>Type:</label>
+            <select id="invSelect" onchange="calc()">
+              <optgroup label="── KTL-L1 (1-fase, Vmax 600V) ──">
+                <option value="2KTL-L1">SUN2000-2KTL-L1</option>
+                <option value="3KTL-L1">SUN2000-3KTL-L1</option>
+                <option value="3.68KTL-L1">SUN2000-3.68KTL-L1</option>
+                <option value="4KTL-L1">SUN2000-4KTL-L1</option>
+                <option value="4.6KTL-L1">SUN2000-4.6KTL-L1</option>
+                <option value="5KTL-L1">SUN2000-5KTL-L1</option>
+                <option value="6KTL-L1">SUN2000-6KTL-L1</option>
+              </optgroup>
+              <optgroup label="── KTL-M1 (3-fase, Vmax 1100V) ──">
+                <option value="3KTL-M1">SUN2000-3KTL-M1</option>
+                <option value="4KTL-M1">SUN2000-4KTL-M1</option>
+                <option value="5KTL-M1" selected>SUN2000-5KTL-M1</option>
+                <option value="6KTL-M1">SUN2000-6KTL-M1</option>
+                <option value="8KTL-M1">SUN2000-8KTL-M1</option>
+                <option value="10KTL-M1">SUN2000-10KTL-M1</option>
+              </optgroup>
+              <optgroup label="── K-LB0 (1-fase, Vmax 600V, nieuw) ──">
+                <option value="3K-LB0">SUN2000-3K-LB0</option>
+                <option value="3.68K-LB0">SUN2000-3.68K-LB0</option>
+                <option value="4K-LB0">SUN2000-4K-LB0</option>
+                <option value="4.6K-LB0">SUN2000-4.6K-LB0</option>
+                <option value="5K-LB0">SUN2000-5K-LB0</option>
+                <option value="6K-LB0">SUN2000-6K-LB0</option>
+              </optgroup>
+            </select>
           </div>
-          <div id="string_inputs"></div>
-          <div style="font-size:0.72rem;color:rgba(255,255,255,0.4);font-family:var(--mono);margin-top:0.6rem" id="string_totaal"></div>
-        </div>
-
-        <div style="padding:0.7rem;background:var(--gray1);border-radius:6px;border:1px solid var(--gray3);">
-          <p style="font-size:0.75rem;color:var(--text2);line-height:1.5;">
-            <strong style="color:var(--navy);">Richtlijn spanningsverlies:</strong><br>
-            • <strong>1%</strong> → conservatief, residentieel (aanbevolen)<br>
-            • <strong>1.5%</strong> → acceptabel bij lange leidingen<br>
-            • <strong>2%</strong> → absolute grens (NEN 1010)
-          </p>
+          <div class="grid3">
+            <div class="fr"><span class="fl">Vmax DC</span><span class="av" id="d_vmax">—</span><span class="fu">V</span></div>
+            <div class="fr"><span class="fl">MPPT bereik</span><span class="av" id="d_mppt">—</span><span class="fu">V</span></div>
+            <div class="fr"><span class="fl">Max. Isc</span><span class="av" id="d_isc">—</span><span class="fu">A</span></div>
+            <div class="fr"><span class="fl">Fase</span><span class="av" id="d_fase">—</span><span class="fu"></span></div>
+            <div class="fr"><span class="fl">Aant. MPPT</span><span class="av" id="d_nmppt">—</span><span class="fu"></span></div>
+            <div class="fr"><span class="fl">Nom. AC</span><span class="av" id="d_pnom">—</span><span class="fu">W</span></div>
+            <div class="fr"><span class="fl">Rec. max PV</span><span class="av" id="d_recpv">—</span><span class="fu">Wp</span></div>
+          </div>
         </div>
       </div>
-    </div>
 
-  </div>
+      <div class="gap"></div>
 
-  <div class="gap"></div>
-
-  <!-- ══ RESULTATEN ══ -->
-  <div class="result-card card">
-    <div class="card-header">
-      <div class="num">★</div>
-      <h2>STRING RESULTAAT</h2>
-      <span class="tag tag-result">resultaat</span>
-    </div>
-    <div class="result-grid">
-      <div class="result-item highlight">
-        <label>Max. panelen / string</label>
-        <div class="val" id="r_maxpan">—</div>
-        <div class="sub" id="r_maxpan_sub">—</div>
-      </div>
-      <div class="result-item highlight">
-        <label>Min. panelen / string</label>
-        <div class="val" id="r_minpan">—</div>
-        <div class="sub">MPPT Vmin limiet</div>
-      </div>
-      <div class="result-item">
-        <label>String Voc bij Tmin</label>
-        <div class="val" id="r_svoc">—</div>
-        <div class="sub" id="r_svoc_sub">—</div>
-      </div>
-      <div class="result-item">
-        <label>String Vmpp</label>
-        <div class="val" id="r_svmpp">—</div>
-        <div class="sub">werkspanning</div>
-      </div>
-      <div class="result-item">
-        <label>String Impp</label>
-        <div class="val" id="r_simpp">—</div>
-        <div class="sub">werkstroom</div>
-      </div>
-      <div class="result-item">
-        <label>String piekvermogen</label>
-        <div class="val" id="r_spwr">—</div>
-        <div class="sub">bij max. panelen</div>
-      </div>
-    </div>
-    <div style="padding:1rem;">
-      <div id="isc_check" class="warning-box ok">—</div>
-    </div>
-  </div>
-
-  <div class="gap"></div>
-
-  <!-- ══ KABEL RESULTAAT ══ -->
-  <div class="card">
-    <div class="card-header">
-      <div class="num">4</div>
-      <h2>KABELADVIES</h2>
-      <span class="tag tag-result">resultaat</span>
-    </div>
-    <div class="card-body">
-      <div class="kabel-result">
-        <div class="kabel-box" id="kabel_box_adv">
-          <label>Aanbevolen kabelsectie</label>
-          <div class="kval" id="r_sadv">—</div>
-          <div class="ksub" id="r_sadv_sub">—</div>
+      <!-- PANEEL -->
+      <div class="card">
+        <div class="ch"><div class="num">2</div><h2>PANEEL GEGEVENS (STC)</h2><span class="tag ti">invoer</span></div>
+        <div class="cb">
+          <div class="fr"><span class="fl b">Type</span><input type="text" id="p_naam" value="TSM-445 NEG9R.28" style="width:160px;text-align:left" oninput="calc()"><span class="fu"></span></div>
+          <div class="fr"><span class="fl">Pmax</span><input type="number" id="p_pmax" value="445" oninput="calc()"><span class="fu">Wp</span></div>
+          <div class="fr"><span class="fl">Voc (STC)</span><input type="number" id="p_voc" value="52.6" step="0.1" oninput="calc()"><span class="fu">V</span></div>
+          <div class="fr"><span class="fl">Vmpp</span><input type="number" id="p_vmpp" value="44.3" step="0.1" oninput="calc()"><span class="fu">V</span></div>
+          <div class="fr"><span class="fl">Isc</span><input type="number" id="p_isc" value="10.05" step="0.01" oninput="calc()"><span class="fu">A</span></div>
+          <div class="fr"><span class="fl">Impp</span><input type="number" id="p_impp" value="10.71" step="0.01" oninput="calc()"><span class="fu">A</span></div>
+          <div class="fr"><span class="fl">Temp.coëff. Voc</span><input type="number" id="p_tvoc" value="-0.24" step="0.01" oninput="calc()"><span class="fu">%/°C</span></div>
+          <div class="fr"><span class="fl">Min. ontwerptemp.</span><input type="number" id="p_tmin" value="-10" step="1" oninput="calc()"><span class="fu">°C</span></div>
         </div>
-        <div class="kabel-box green">
-          <label>Omslagpunt 4 → 6 mm²</label>
-          <div class="kval" id="r_omslag46">—</div>
-          <div class="ksub">max. kabellengte bij 4 mm²</div>
-        </div>
-        <div class="kabel-box orange">
-          <label>Omslagpunt 6 → 10 mm²</label>
-          <div class="kval" id="r_omslag610">—</div>
-          <div class="ksub">max. kabellengte bij 6 mm²</div>
-        </div>
-        <div class="kabel-box" id="kabel_box_verlies">
-          <label>Werkelijk spanningsverlies</label>
-          <div class="kval" id="r_verlies">—</div>
-          <div class="ksub" id="r_verlies_sub">—</div>
+      </div>
+
+      <div class="gap"></div>
+
+      <!-- KABEL -->
+      <div class="card">
+        <div class="ch"><div class="num">3</div><h2>KABELGEGEVENS</h2><span class="tag ti">invoer</span></div>
+        <div class="cb">
+          <div class="fr"><span class="fl b">Kabellengte (één richting)</span><input type="number" id="k_len" value="20" step="1" min="1" oninput="calc()"><span class="fu">m</span></div>
+          <div class="fr"><span class="fl b">Max. spanningsverlies</span><input type="number" id="k_pct" value="1.0" step="0.1" min="0.1" max="5" oninput="calc()"><span class="fu">%</span></div>
+          <div class="fr"><span class="fl">Soortelijke weerstand ρ</span><input type="number" id="k_rho" value="0.0175" step="0.0001" oninput="calc()"><span class="fu">Ω·mm²/m</span></div>
+          <div style="margin-top:.8rem;padding:.7rem;background:var(--gray1);border-radius:6px;border:1px solid var(--gray3);font-size:.75rem;color:var(--text2);line-height:1.5">
+            <strong style="color:var(--navy)">Richtlijn:</strong> 1% conservatief · 1.5% aanvaardbaar · 2% grens
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="gap"></div>
-
-  <!-- ══ VERMOGEN CHECK ══ -->
-  <div class="card">
-    <div class="card-header">
-      <div class="num">5</div>
-      <h2>VERMOGEN & DC/AC RATIO</h2>
-      <span class="tag tag-result">resultaat</span>
-    </div>
-    <div class="card-body">
-      <div class="grid-3" style="gap:0.8rem; margin-bottom:1rem;">
-        <div style="background:var(--gray1);border-radius:6px;border:1px solid var(--gray3);padding:0.8rem 1rem;">
-          <div style="font-size:0.7rem;font-family:var(--mono);color:var(--text2);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.3rem;">Totaal PV vermogen</div>
-          <div style="font-family:var(--display);font-size:1.4rem;font-weight:700;color:var(--navy)" id="r_totpv">—</div>
-          <div style="font-size:0.72rem;font-family:var(--mono);color:var(--text2);margin-top:0.2rem" id="r_totpv_sub">—</div>
+    <!-- RECHTER KOLOM: RESULTATEN -->
+    <div>
+      <!-- STRING LIMIETEN -->
+      <div class="card" style="background:var(--navy);border:none">
+        <div class="ch ch-yellow"><div class="num">★</div><h2>STRING LIMIETEN</h2><span class="tag tr">resultaat</span></div>
+        <div class="rg">
+          <div class="ri hl"><label>Max. panelen/string</label><div class="val" id="r_maxpan">—</div><div class="sub" id="r_maxpan_sub">—</div></div>
+          <div class="ri hl"><label>Min. panelen/string</label><div class="val" id="r_minpan">—</div><div class="sub">MPPT Vmin limiet</div></div>
+          <div class="ri"><label>Voc/pan. bij Tmin</label><div class="val" id="r_voc_tmin">—</div><div class="sub">worst case</div></div>
+          <div class="ri"><label>Vmpp/pan.</label><div class="val" id="r_vmpp">—</div><div class="sub">werkspanning</div></div>
+          <div class="ri"><label>Impp (string)</label><div class="val" id="r_impp">—</div><div class="sub">werkstroom</div></div>
+          <div class="ri"><label>Isc check</label><div class="val" id="r_isc_check">—</div><div class="sub" id="r_isc_sub">—</div></div>
         </div>
-        <div style="background:var(--gray1);border-radius:6px;border:1px solid var(--gray3);padding:0.8rem 1rem;">
-          <div style="font-size:0.7rem;font-family:var(--mono);color:var(--text2);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.3rem;">Aanbevolen max. PV</div>
-          <div style="font-family:var(--display);font-size:1.4rem;font-weight:700;color:var(--navy)" id="r_recpv">—</div>
-          <div style="font-size:0.72rem;font-family:var(--mono);color:var(--text2);margin-top:0.2rem">uit datasheet omvormer</div>
-        </div>
-        <div id="dcac_box" style="border-radius:6px;border:1.5px solid;padding:0.8rem 1rem;">
-          <div style="font-size:0.7rem;font-family:var(--mono);color:var(--text2);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.3rem;">DC/AC ratio</div>
-          <div style="font-family:var(--display);font-size:1.4rem;font-weight:700" id="r_dcac">—</div>
-          <div style="font-size:0.72rem;font-family:var(--mono);color:var(--text2);margin-top:0.2rem" id="r_dcac_sub">—</div>
+        <div style="padding:1rem">
+          <div id="isc_msg" class="wb ok">—</div>
         </div>
       </div>
-      <div id="pwr_check" class="warning-box ok">—</div>
-      <div style="margin-top:0.8rem;padding:0.7rem;background:var(--gray1);border-radius:6px;border:1px solid var(--gray3);">
-        <p style="font-size:0.75rem;color:var(--text2);line-height:1.6;">
-          <strong style="color:var(--navy);">Richtlijn DC/AC ratio:</strong><br>
-          • <strong style="color:var(--green);">1.0 – 1.2</strong> → ideaal, minimale clipping<br>
-          • <strong style="color:#ca8a04;">1.2 – 1.5</strong> → aanvaardbaar, lichte clipping bij piekzon<br>
-          • <strong style="color:var(--red);">&gt; 1.5</strong> → te hoog, significante opbrengstderving
-        </p>
-      </div>
-    </div>
-  </div>
 
-  <div class="gap"></div>
+      <div class="gap"></div>
 
-  <!-- ══ OVERZICHTSTABEL ══ -->
-  <div class="card tabel-card">
-    <div class="card-header">
-      <div class="num">5</div>
-      <h2>OVERZICHTSTABEL — panelen × kabellengte → aanbevolen sectie</h2>
-    </div>
-    <div class="card-body">
-      <div class="tabel-wrap">
-        <table id="overzicht"></table>
+      <!-- STRINGVERDELING PER VLAK -->
+      <div class="card">
+        <div class="ch"><div class="num">4</div><h2>STRINGVERDELING PER DAKVLAK</h2><span class="tag ti">invoer + validatie</span></div>
+        <div class="cb">
+          <div class="string-section">
+            <h4>PANELEN PER STRING — KLIK OM AAN TE PASSEN</h4>
+            <div id="string_inputs"><p style="color:rgba(255,255,255,.4);font-size:.8rem">Voeg dakvlakken toe in de dimensioneringstab.</p></div>
+            <div class="str-totaal" id="str_totaal"></div>
+          </div>
+
+          <!-- PER-VLAK RESULTATEN -->
+          <div id="vlak_results"></div>
+        </div>
       </div>
-      <div class="legenda">
-        <div class="leg-item"><div class="leg-dot" style="background:#dcfce7;border:1px solid #86efac"></div>4 mm²</div>
-        <div class="leg-item"><div class="leg-dot" style="background:#fef9c3;border:1px solid #fde047"></div>6 mm²</div>
-        <div class="leg-item"><div class="leg-dot" style="background:#ffedd5;border:1px solid #fdba74"></div>≥10 mm²</div>
-        <div class="leg-item"><div class="leg-dot" style="background:#fee2e2;border:1px solid #fca5a5"></div>string te lang</div>
-        <div class="leg-item"><div class="leg-dot" style="background:#ede9fe;border:1px solid #c4b5fd"></div>string te kort (&lt; Vmin)</div>
+
+      <div class="gap"></div>
+
+      <!-- KABELADVIES -->
+      <div class="card">
+        <div class="ch"><div class="num">5</div><h2>KABELADVIES</h2><span class="tag tr">resultaat</span></div>
+        <div class="cb">
+          <div class="kr" id="kabel_result">
+            <div class="kb g"><label>Aanbevolen sectie</label><div class="kv" id="r_sadv">—</div><div class="ks" id="r_sadv_sub">—</div></div>
+            <div class="kb g"><label>Omslagpunt 4→6 mm²</label><div class="kv" id="r_omslag46">—</div><div class="ks">max. lengte bij 4mm²</div></div>
+            <div class="kb o"><label>Omslagpunt 6→10 mm²</label><div class="kv" id="r_omslag610">—</div><div class="ks">max. lengte bij 6mm²</div></div>
+            <div class="kb g" id="kb_verlies"><label>Werkelijk verlies</label><div class="kv" id="r_verlies">—</div><div class="ks" id="r_verlies_sub">—</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="gap"></div>
+
+      <!-- VERMOGEN DC/AC -->
+      <div class="card">
+        <div class="ch"><div class="num">6</div><h2>VERMOGEN &amp; DC/AC RATIO</h2><span class="tag tr">resultaat</span></div>
+        <div class="cb">
+          <div class="grid3" style="gap:.8rem;margin-bottom:1rem">
+            <div style="background:var(--gray1);border-radius:6px;border:1px solid var(--gray3);padding:.8rem 1rem">
+              <div style="font-size:.68rem;font-family:var(--mono);color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.3rem">Totaal PV</div>
+              <div style="font-family:var(--display);font-size:1.2rem;font-weight:700;color:var(--navy)" id="r_totpv">—</div>
+              <div style="font-size:.7rem;font-family:var(--mono);color:var(--text2);margin-top:.2rem" id="r_totpv_sub">—</div>
+            </div>
+            <div style="background:var(--gray1);border-radius:6px;border:1px solid var(--gray3);padding:.8rem 1rem">
+              <div style="font-size:.68rem;font-family:var(--mono);color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.3rem">Rec. max PV</div>
+              <div style="font-family:var(--display);font-size:1.2rem;font-weight:700;color:var(--navy)" id="r_recpv2">—</div>
+              <div style="font-size:.7rem;font-family:var(--mono);color:var(--text2);margin-top:.2rem">uit datasheet</div>
+            </div>
+            <div class="dcac-box" id="dcac_box">
+              <label>DC/AC ratio</label>
+              <div class="kv" id="r_dcac">—</div>
+              <div class="ks" id="r_dcac_sub">—</div>
+            </div>
+          </div>
+          <div id="pwr_check" class="wb ok">—</div>
+          <div style="margin-top:.8rem;padding:.7rem;background:var(--gray1);border-radius:6px;border:1px solid var(--gray3);font-size:.75rem;color:var(--text2);line-height:1.6">
+            <strong style="color:var(--navy)">DC/AC richtlijn:</strong><br>
+            <span style="color:var(--green)">■</span> ≤1.20 ideaal &nbsp; <span style="color:#ca8a04">■</span> 1.20–1.50 aanvaardbaar &nbsp; <span style="color:var(--red)">■</span> >1.50 te hoog
+          </div>
+        </div>
+      </div>
+
+      <div class="gap"></div>
+
+      <!-- OVERZICHTSTABEL -->
+      <div class="card">
+        <div class="ch"><div class="num">7</div><h2>OVERZICHTSTABEL</h2></div>
+        <div class="cb">
+          <div class="tw"><table id="overzicht"></table></div>
+          <div class="leg">
+            <div class="leg-i"><div class="leg-d" style="background:var(--green-bg);border:1px solid #86efac"></div>4 mm²</div>
+            <div class="leg-i"><div class="leg-d" style="background:#fef9c3;border:1px solid #fde047"></div>6 mm²</div>
+            <div class="leg-i"><div class="leg-d" style="background:#ffedd5;border:1px solid #fdba74"></div>≥10 mm²</div>
+            <div class="leg-i"><div class="leg-d" style="background:var(--red-bg);border:1px solid #fca5a5"></div>✘ te lang</div>
+            <div class="leg-i"><div class="leg-d" style="background:var(--purple-bg);border:1px solid #c4b5fd"></div>&lt; Vmin</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-
-</div><!-- /container -->
+</div>
 </div><!-- /tab-calc -->
 
 <script>
-// ── OMVORMER DATABASE ─────────────────────────────────────────────────────────
+// ══ DATABASE ════════════════════════════════════════════════════════════════
 const DB = {
-  // type: [fase, vmax, vstart, vmppt_min, vmppt_max, imax_mppt, isc_max, n_mppt, pnom_w, rec_pv_wp]
-  "2KTL-L1":    ["1-fase", 600, 100, 90, 560, 12.5, 18, 2,  2000,  3000],
-  "3KTL-L1":    ["1-fase", 600, 100, 90, 560, 12.5, 18, 2,  3000,  4500],
-  "3.68KTL-L1": ["1-fase", 600, 100, 90, 560, 12.5, 18, 2,  3680,  5520],
-  "4KTL-L1":    ["1-fase", 600, 100, 90, 560, 12.5, 18, 2,  4000,  6000],
-  "4.6KTL-L1":  ["1-fase", 600, 100, 90, 560, 12.5, 18, 2,  4600,  6900],
-  "5KTL-L1":    ["1-fase", 600, 100, 90, 560, 12.5, 18, 2,  5000,  7500],
-  "6KTL-L1":    ["1-fase", 600, 100, 90, 560, 12.5, 18, 2,  6000,  9000],
-  "3KTL-M1":    ["3-fase", 1100, 200, 140, 980, 13.5, 19.5, 2,  3000,  4500],
-  "4KTL-M1":    ["3-fase", 1100, 200, 140, 980, 13.5, 19.5, 2,  4000,  6000],
-  "5KTL-M1":    ["3-fase", 1100, 200, 140, 980, 13.5, 19.5, 2,  5000,  7500],
-  "6KTL-M1":    ["3-fase", 1100, 200, 140, 980, 13.5, 19.5, 2,  6000,  9000],
-  "8KTL-M1":    ["3-fase", 1100, 200, 140, 980, 13.5, 19.5, 2,  8000, 12000],
-  "10KTL-M1":   ["3-fase", 1100, 200, 140, 980, 13.5, 19.5, 2, 10000, 15000],
-  "3K-LB0":     ["1-fase", 600, 50, 40, 560, 16, 20, 2,  3000,  4500],
-  "3.68K-LB0":  ["1-fase", 600, 50, 40, 560, 16, 20, 2,  3680,  5520],
-  "4K-LB0":     ["1-fase", 600, 50, 40, 560, 16, 20, 2,  4000,  6000],
-  "4.6K-LB0":   ["1-fase", 600, 50, 40, 560, 16, 20, 2,  4600,  6900],
-  "5K-LB0":     ["1-fase", 600, 50, 40, 560, 16, 20, 2,  5000,  7500],
-  "6K-LB0":     ["1-fase", 600, 50, 40, 560, 16, 20, 2,  6000,  9000],
+  // [fase, vmax, vstart, vmppt_min, vmppt_max, imax, isc_max, nmppt, pnom_w, rec_pv_wp]
+  "2KTL-L1":    ["1-fase",600,100,90,560,12.5,18,2,2000,3000],
+  "3KTL-L1":    ["1-fase",600,100,90,560,12.5,18,2,3000,4500],
+  "3.68KTL-L1": ["1-fase",600,100,90,560,12.5,18,2,3680,5520],
+  "4KTL-L1":    ["1-fase",600,100,90,560,12.5,18,2,4000,6000],
+  "4.6KTL-L1":  ["1-fase",600,100,90,560,12.5,18,2,4600,6900],
+  "5KTL-L1":    ["1-fase",600,100,90,560,12.5,18,2,5000,7500],
+  "6KTL-L1":    ["1-fase",600,100,90,560,12.5,18,2,6000,9000],
+  "3KTL-M1":    ["3-fase",1100,200,140,980,13.5,19.5,2,3000,4500],
+  "4KTL-M1":    ["3-fase",1100,200,140,980,13.5,19.5,2,4000,6000],
+  "5KTL-M1":    ["3-fase",1100,200,140,980,13.5,19.5,2,5000,7500],
+  "6KTL-M1":    ["3-fase",1100,200,140,980,13.5,19.5,2,6000,9000],
+  "8KTL-M1":    ["3-fase",1100,200,140,980,13.5,19.5,2,8000,12000],
+  "10KTL-M1":   ["3-fase",1100,200,140,980,13.5,19.5,2,10000,15000],
+  "3K-LB0":     ["1-fase",600,50,40,560,16,20,2,3000,4500],
+  "3.68K-LB0":  ["1-fase",600,50,40,560,16,20,2,3680,5520],
+  "4K-LB0":     ["1-fase",600,50,40,560,16,20,2,4000,6000],
+  "4.6K-LB0":   ["1-fase",600,50,40,560,16,20,2,4600,6900],
+  "5K-LB0":     ["1-fase",600,50,40,560,16,20,2,5000,7500],
+  "6K-LB0":     ["1-fase",600,50,40,560,16,20,2,6000,9000],
 };
 
-function g(id) { return parseFloat(document.getElementById(id).value) || 0; }
-function s(id, val) { document.getElementById(id).textContent = val; }
+// ══ HELPERS ═════════════════════════════════════════════════════════════════
+function g(id){ return parseFloat(document.getElementById(id)?.value)||0; }
+function s(id,v){ const el=document.getElementById(id); if(el) el.textContent=v; }
 
-function buildStringInputs(nmppt, rec_max, rec_min) {
-  const wrap = document.getElementById('string_inputs');
-  // Determine how many string rows to show based on nmppt (max 2 per MPPT for now)
-  // We keep existing values if already rendered
-  const existing = wrap.querySelectorAll('.string-input');
-  // Default: 2 strings (1 per MPPT input), pre-filled with rec_max
-  const numRows = nmppt * 1; // 1 string per MPPT by default; user can add more later
-  // We render nmppt rows; user can see up to nmppt strings
-  // Actually: render nmppt * max_inputs_per_mppt but keep it simple: nmppt rows
-  if (wrap.children.length === 0) {
-    // First build
-    for (let i = 0; i < nmppt; i++) {
-      const row = document.createElement('div');
-      row.className = 'string-row';
-      row.innerHTML = `
-        <span class="string-label">MPPT ${i+1} — String A</span>
-        <input class="string-input" type="number" min="0" max="30"
-               value="${rec_max}" oninput="calcStrings()" id="str_${i}_0">
-        <span class="string-detail" id="str_detail_${i}_0">—</span>
-        <span class="string-badge badge-empty" id="str_badge_${i}_0">—</span>
-      `;
-      wrap.appendChild(row);
-    }
-  } else {
-    // Update number of rows if nmppt changed
-    while (wrap.children.length < nmppt) {
-      const i = wrap.children.length;
-      const row = document.createElement('div');
-      row.className = 'string-row';
-      row.innerHTML = `
-        <span class="string-label">MPPT ${i+1} — String A</span>
-        <input class="string-input" type="number" min="0" max="30"
-               value="${rec_max}" oninput="calcStrings()" id="str_${i}_0">
-        <span class="string-detail" id="str_detail_${i}_0">—</span>
-        <span class="string-badge badge-empty" id="str_badge_${i}_0">—</span>
-      `;
-      wrap.appendChild(row);
-    }
-    while (wrap.children.length > nmppt) {
-      wrap.removeChild(wrap.lastChild);
-    }
-  }
+function switchTab(tab, btn){
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  btn.classList.add('active');
 }
 
-function calcStrings() {
-  const type = document.getElementById('invSelect').value;
-  const inv  = DB[type];
-  if (!inv) return;
-  const [fase, vmax, vstart, vmppt_min, vmppt_max, imax, isc_max, nmppt, pnom_w, rec_pv_wp] = inv;
-
-  const voc   = g('p_voc');
-  const vmpp  = g('p_vmpp');
-  const pmax  = g('p_pmax');
-  const p_isc = g('p_isc');
-  const impp  = g('p_impp');
-  const tvoc  = g('p_tvoc');
-  const tmin  = g('p_tmin');
-  const L     = g('k_len');
-  const pct   = g('k_pct');
-  const rho   = g('k_rho');
-
-  const voc_tmin  = voc * (1 + (tvoc / 100) * (tmin - 25));
-  const max_vmax  = Math.floor(vmax / voc_tmin);
-  const max_vmppt = Math.floor(vmppt_max / vmpp);
-  const min_vmppt = Math.ceil(vmppt_min / vmpp);
-  const rec_max   = Math.min(max_vmax, max_vmppt);
-
-  let totalPanelen = 0;
-  let allOk = true;
-
-  for (let i = 0; i < nmppt; i++) {
-    const inp = document.getElementById(`str_${i}_0`);
-    if (!inp) continue;
-    const n = parseInt(inp.value) || 0;
-    totalPanelen += n;
-
-    const detail = document.getElementById(`str_detail_${i}_0`);
-    const badge  = document.getElementById(`str_badge_${i}_0`);
-
-    if (n === 0) {
-      detail.textContent = 'niet gebruikt';
-      badge.textContent  = '—';
-      badge.className    = 'string-badge badge-empty';
-      continue;
-    }
-
-    // Validatie
-    const s_voc  = n * voc_tmin;
-    const s_vmpp = n * vmpp;
-    const v_verlies_max = s_vmpp * (pct / 100);
-    const s_min  = (2 * L * impp * rho) / v_verlies_max;
-    const sectie = s_min <= 4 ? '4mm²' : s_min <= 6 ? '6mm²' : '≥10mm²';
-
-    detail.textContent = `Voc:${s_voc.toFixed(0)}V  Vmpp:${s_vmpp.toFixed(0)}V  ${sectie}`;
-
-    if (n < min_vmppt) {
-      badge.textContent = `< Vmin (min.${min_vmppt})`;
-      badge.className   = 'string-badge badge-vmin';
-      allOk = false;
-    } else if (s_voc > vmax) {
-      badge.textContent = `✘ Voc > Vmax!`;
-      badge.className   = 'string-badge badge-err';
-      allOk = false;
-    } else if (n > rec_max) {
-      badge.textContent = `⚠ > max (${rec_max})`;
-      badge.className   = 'string-badge badge-warn';
-      allOk = false;
-    } else {
-      badge.textContent = `✔ OK (${n} pan.)`;
-      badge.className   = 'string-badge badge-ok';
-    }
-  }
-
-  // Totaal
-  const totPv  = totalPanelen * pmax;
-  const dcac   = pnom_w > 0 ? totPv / pnom_w : 0;
-  const dcacKleur = dcac <= 1.2 ? '#86efac' : dcac <= 1.5 ? '#fde047' : '#fca5a5';
-  document.getElementById('string_totaal').innerHTML =
-    `Totaal: <strong style="color:#fff">${totalPanelen} panelen</strong> · ${(totPv/1000).toFixed(2)} kWp · DC/AC: <strong style="color:${dcacKleur}">${dcac.toFixed(2)}</strong>`;
+// ══ IRRADIATIE MODEL (België ~51°N) ════════════════════════════════════════
+const IRR_BASE = {
+  'Z':950,'ZZW':935,'ZZO':935,'ZW':900,'ZO':900,
+  'WZW':850,'ONO':850,'W':800,'O':800,
+  'NWN':720,'NON':720,'NW':680,'NO':680,
+  'NNW':640,'NNO':640,'N':600
+};
+const OPT_HELLING = {
+  'Z':35,'ZZW':35,'ZZO':35,'ZW':33,'ZO':33,'WZW':30,'ONO':30,
+  'W':28,'O':28,'NWN':22,'NON':22,'NW':20,'NO':20,'NNW':15,'NNO':15,'N':10
+};
+function getIrr(ori, h){
+  const base = IRR_BASE[ori]||800;
+  const opt  = OPT_HELLING[ori]||35;
+  const factor = Math.max(0.5, 1 - 0.003*Math.abs(h-opt));
+  return base * factor;
 }
 
+// ══ DAKVLAKKEN ══════════════════════════════════════════════════════════════
+let vlakId=0;
+let vlakken=[];
+let dimMode='kwh';
 
+const ORI_OPTS = [
+  ['Z','Zuid'],['ZZW','Zuid-ZW'],['ZZO','Zuid-ZO'],
+  ['ZW','ZuidWest'],['ZO','ZuidOost'],
+  ['WZW','West-ZW'],['ONO','Oost-NO'],
+  ['W','West'],['O','Oost'],
+  ['NWN','NW-Noord'],['NON','NO-Noord'],
+  ['NW','NoorWest'],['NO','NoordOost'],
+  ['NNW','Noord-NW'],['NNO','Noord-NO'],['N','Noord']
+];
 
-// ── TAB SWITCHING ─────────────────────────────────────────────────────────────
-function switchTab(tab) {
-  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + tab).classList.add('active');
-  event.target.classList.add('active');
+function oriSel(sel){
+  return ORI_OPTS.map(([v,l])=>`<option value="${v}"${v===sel?' selected':''}>${l}</option>`).join('');
 }
 
-// ── DIMENSIONERING MODUS ──────────────────────────────────────────────────────
-let dimMode = 'kwh';
-function setMode(m) {
-  dimMode = m;
-  document.getElementById('inputKwh').style.display = m === 'kwh' ? '' : 'none';
-  document.getElementById('inputPan').style.display = m === 'pan' ? '' : 'none';
-  document.getElementById('modeKwhBtn').classList.toggle('active', m === 'kwh');
-  document.getElementById('modePanBtn').classList.toggle('active', m === 'pan');
+function addVlak(naam='',ori='Z',helling=35,npan=10){
+  const id=vlakId++;
+  vlakken.push({id, naam:naam||`Vlak ${id+1}`, ori, helling:parseInt(helling)||35, npan:parseInt(npan)||10});
+  renderVlakken();
   calcDim();
 }
 
-// ── DIMENSIONERING BEREKENING ─────────────────────────────────────────────────
-function calcDim() {
-  const irr      = parseFloat(document.getElementById('d_orient').value);
-  const eff      = g('d_eff') / 100;
-  const pmax     = g('d_pmax');
-  const fasePref = document.getElementById('d_fase_pref').value;
-  if (!pmax || !irr || !eff) return;
+function removeVlak(id){
+  vlakken=vlakken.filter(v=>v.id!==id);
+  renderVlakken();
+  calcDim();
+}
 
-  let npan, totPv, prod, benodigdKwp;
-
-  if (dimMode === 'kwh') {
-    const kwh = g('d_kwh');
-    if (!kwh) return;
-    // kWp nodig = kWh / (irr * eff)
-    benodigdKwp = kwh / (irr * eff);
-    npan = Math.ceil((benodigdKwp * 1000) / pmax);
-    totPv = npan * pmax;
-    prod  = Math.round((totPv / 1000) * irr * eff);
-  } else {
-    npan  = Math.round(g('d_npan'));
-    if (!npan) return;
-    totPv = npan * pmax;
-    benodigdKwp = totPv / 1000;
-    prod  = Math.round((totPv / 1000) * irr * eff);
+function renderVlakken(){
+  const wrap=document.getElementById('vlakken_list');
+  if(!vlakken.length){
+    wrap.innerHTML='<p style="font-size:.8rem;color:var(--text2);padding:.5rem 0">Nog geen dakvlakken.</p>';
+    return;
   }
+  const readonly = dimMode==='kwh';
+  wrap.innerHTML = vlakken.map(v=>`
+    <div class="vlak-row">
+      <input class="vi" type="text" value="${v.naam}" oninput="vlakken.find(x=>x.id===${v.id}).naam=this.value;calcDim()">
+      <select class="vi" style="font-size:.75rem" onchange="vlakken.find(x=>x.id===${v.id}).ori=this.value;calcDim()">${oriSel(v.ori)}</select>
+      <div style="display:flex;align-items:center;gap:.3rem">
+        <input class="vi" type="number" value="${v.helling}" min="0" max="90" step="5" style="width:52px;text-align:center" oninput="vlakken.find(x=>x.id===${v.id}).helling=parseInt(this.value)||0;calcDim()">
+        <span style="font-size:.7rem;color:var(--text2);font-family:var(--mono)">°</span>
+      </div>
+      <input class="vi${readonly?' ro':''}" type="number" value="${v.npan}" min="0" max="200" step="1" id="vpan_${v.id}" style="text-align:center" ${readonly?'readonly':''} oninput="vlakken.find(x=>x.id===${v.id}).npan=parseInt(this.value)||0;calcDim()">
+      <button class="vdel" onclick="removeVlak(${v.id})">✕</button>
+    </div>
+  `).join('');
+}
 
-  s('ds_kwp',   benodigdKwp.toFixed(2) + ' kWp');
-  s('ds_npan',  npan + ' panelen');
-  s('ds_totpv', (totPv / 1000).toFixed(2) + ' kWp');
-  s('ds_prod',  prod.toLocaleString('nl-BE') + ' kWh/j');
+function setMode(m){
+  dimMode=m;
+  document.getElementById('inputKwh').style.display=m==='kwh'?'':'none';
+  document.getElementById('modeKwhBtn').classList.toggle('active',m==='kwh');
+  document.getElementById('modePanBtn').classList.toggle('active',m==='pan');
+  document.getElementById('pan_col_hdr').textContent=m==='kwh'?'PANELEN (auto)':'PANELEN';
+  renderVlakken();
+  calcDim();
+}
 
-  // Zoek beste omvormers
-  const candidates = [];
-  for (const [type, inv] of Object.entries(DB)) {
-    const [fase, vmax, vstart, vmppt_min, vmppt_max, imax, isc_max, nmppt, pnom_w, rec_pv_wp] = inv;
-    if (fasePref !== 'both' && fase !== fasePref) continue;
-
-    // DC/AC ratio bij totaal PV
-    const dcac = totPv / pnom_w;
-    // Sla over als ratio absurd hoog (> 2.0) of te laag (< 0.7)
-    if (dcac > 2.0 || dcac < 0.5) continue;
-
-    // Score: ideaal = 1.0–1.15, goed = 1.15–1.3, aanvaardbaar = 1.3–1.5
-    let score;
-    if      (dcac >= 1.0 && dcac <= 1.15) score = 100;
-    else if (dcac > 1.15 && dcac <= 1.3)  score = 85;
-    else if (dcac > 0.85 && dcac < 1.0)   score = 80;
-    else if (dcac > 1.3  && dcac <= 1.5)  score = 60;
-    else if (dcac > 0.7  && dcac <= 0.85) score = 50;
-    else score = 30;
-
-    candidates.push({ type, fase, pnom_w, rec_pv_wp, dcac, score, nmppt });
+// ══ MPPT TOEWIJZING ═════════════════════════════════════════════════════════
+// Regel: elke unieke oriëntatie krijgt een eigen MPPT-tracker
+// Vlakken met zelfde oriëntatie kunnen parallel op dezelfde MPPT (maar mogen niet gemengd worden)
+function getMpptToewijzing(nmppt){
+  const assignments=[]; // {vlakId, mppt (1-based)}
+  const oriToMppt={};
+  let nextMppt=1;
+  for(const v of vlakken){
+    if(!(v.ori in oriToMppt)){
+      if(nextMppt<=nmppt){
+        oriToMppt[v.ori]=nextMppt++;
+      } else {
+        oriToMppt[v.ori]=null; // te veel oriëntaties
+      }
+    }
+    assignments.push({vlakId:v.id, mppt:oriToMppt[v.ori]});
   }
+  return assignments;
+}
 
-  candidates.sort((a, b) => b.score - a.score || a.dcac - b.dcac);
-  const top3 = candidates.slice(0, 3);
+const MPPT_COLORS=['#f6b824','#3b82f6','#16a34a','#a855f7','#ef4444','#f97316'];
 
-  let html = '';
-  if (top3.length === 0) {
-    html = '<div class="warning-box error">Geen geschikte omvormer gevonden voor dit vermogen. Pas de filtercriteria aan.</div>';
-  } else {
-    const ranks = ['rank1', 'rank2', 'rank3'];
-    const labels = ['★ Beste keuze', '▲ Goed alternatief', '○ Alternatief'];
-    top3.forEach((inv, i) => {
-      const dcacPct = Math.min(inv.dcac / 1.5 * 100, 100);
-      const barColor = inv.dcac <= 1.2 ? '#16a34a' : inv.dcac <= 1.5 ? '#ca8a04' : '#dc2626';
-      const dcacLabel = inv.dcac <= 1.2 ? 'Ideaal' : inv.dcac <= 1.5 ? 'Aanvaardbaar' : 'Hoog';
-      html += `
-      <div class="inv-card ${ranks[i]}" style="margin-bottom:0.8rem">
-        <div class="inv-name">
-          <span class="rank-badge">${labels[i]}</span>
-          SUN2000-${inv.type}
-        </div>
-        <div class="inv-stat-grid">
-          <div class="inv-stat">Fase: <strong>${inv.fase}</strong></div>
-          <div class="inv-stat">AC vermogen: <strong>${(inv.pnom_w/1000).toFixed(2)} kW</strong></div>
-          <div class="inv-stat">Rec. max PV: <strong>${(inv.rec_pv_wp/1000).toFixed(1)} kWp</strong></div>
-          <div class="inv-stat">DC/AC ratio: <strong>${inv.dcac.toFixed(2)}</strong></div>
-        </div>
-        <div class="ratio-bar-wrap">
-          <div class="ratio-bar-label">
-            <span>DC/AC ratio: ${inv.dcac.toFixed(2)} — ${dcacLabel}</span>
-            <span>ideaal ≤ 1.20</span>
-          </div>
-          <div class="ratio-bar-track">
-            <div class="ratio-bar-fill" style="width:${dcacPct}%;background:${barColor}"></div>
-          </div>
-        </div>
-        <button class="use-btn" onclick="useInverter('${inv.type}')">
-          Gebruik in String Calculator →
-        </button>
-      </div>`;
+// ══ DIMENSIONERING ══════════════════════════════════════════════════════════
+function calcDim(){
+  const eff=g('d_eff')/100;
+  const pmax=g('d_pmax');
+  const fasePref=document.getElementById('d_fase_pref').value;
+  if(!pmax||!eff||!vlakken.length) return;
+
+  // In kWh-modus: bereken npan per vlak proportioneel aan hun irradiatie
+  if(dimMode==='kwh'){
+    const kwh=g('d_kwh');
+    if(!kwh) return;
+    const irrs=vlakken.map(v=>getIrr(v.ori,v.helling));
+    const totIrr=irrs.reduce((a,b)=>a+b,0);
+    vlakken.forEach((v,i)=>{
+      const aandeel=irrs[i]/totIrr;
+      const kwhVlak=kwh*aandeel;
+      v.npan=Math.max(1,Math.ceil((kwhVlak/(irrs[i]*eff))*1000/pmax));
+      const el=document.getElementById(`vpan_${v.id}`);
+      if(el) el.value=v.npan;
     });
   }
-  document.getElementById('inv-recommendations').innerHTML = html;
+
+  // Totalen
+  let totNpan=0, totProd=0;
+  const vlakInfos=vlakken.map(v=>{
+    const irr=getIrr(v.ori,v.helling);
+    const prod=Math.round((v.npan*pmax/1000)*irr*eff);
+    totNpan+=v.npan; totProd+=prod;
+    return {v, irr, prod};
+  });
+  const totPv=totNpan*pmax;
+
+  // Summary
+  s('ds_npan', totNpan+' panelen');
+  s('ds_totpv',(totPv/1000).toFixed(2)+' kWp');
+  s('ds_prod', totProd.toLocaleString('nl-BE')+' kWh/j');
+  if(dimMode==='kwh'){
+    s('ds_kwp_lbl','Gewenste productie');
+    s('ds_kwp',g('d_kwh').toLocaleString('nl-BE')+' kWh/j');
+  } else {
+    s('ds_kwp_lbl','Spec. opbrengst gem.');
+    const sp=totNpan>0?Math.round(totProd/(totPv/1000)):0;
+    s('ds_kwp',sp+' kWh/kWp');
+  }
+
+  // Per-vlak samenvatting
+  document.getElementById('ds_vlakken').innerHTML=vlakInfos.map(({v,irr,prod})=>`
+    <div class="dvlak-row">
+      <span style="color:rgba(255,255,255,.7);min-width:70px">${v.naam}</span>
+      <span style="color:rgba(255,255,255,.45)">${v.ori} · ${v.helling}° · ${Math.round(irr)} kWh/kWp</span>
+      <span style="color:var(--yellow);font-weight:600">${v.npan} pan. → ~${prod.toLocaleString('nl-BE')} kWh/j</span>
+    </div>`).join('');
+
+  // MPPT toewijzing (gebruik placeholder nmppt=2 voor weergave)
+  const nmppt=2;
+  const assignments=getMpptToewijzing(nmppt);
+  renderMpptToewijzing(assignments, nmppt);
+
+  // Omvormer aanbevelingen
+  const candidates=[];
+  for(const [type,inv] of Object.entries(DB)){
+    const [fase,,,,,,,,pnom_w,rec_pv_wp]=inv;
+    if(fasePref!=='both'&&fase!==fasePref) continue;
+    const dcac=totPv/pnom_w;
+    if(dcac>2.0||dcac<0.5) continue;
+    let score;
+    if(dcac>=1.0&&dcac<=1.15)      score=100;
+    else if(dcac>1.15&&dcac<=1.3)  score=85;
+    else if(dcac>0.85&&dcac<1.0)   score=80;
+    else if(dcac>1.3&&dcac<=1.5)   score=60;
+    else score=30;
+    candidates.push({type,fase,pnom_w,rec_pv_wp,dcac,score});
+  }
+  candidates.sort((a,b)=>b.score-a.score||a.dcac-b.dcac);
+  const top3=candidates.slice(0,3);
+  const ranks=['r1','r2','r3'];
+  const labels=['★ Beste keuze','▲ Alternatief','○ Alternatief'];
+  let html=top3.length===0?'<div class="wb err">Geen geschikte omvormer gevonden.</div>':
+    top3.map((inv,i)=>{
+      const dcacPct=Math.min(inv.dcac/1.5*100,100);
+      const bc=inv.dcac<=1.2?'#16a34a':inv.dcac<=1.5?'#ca8a04':'#dc2626';
+      const dl=inv.dcac<=1.2?'Ideaal':inv.dcac<=1.5?'Aanvaardbaar':'Hoog';
+      return `<div class="ic ${ranks[i]}">
+        <div class="iname"><span class="rbadge">${labels[i]}</span>SUN2000-${inv.type}</div>
+        <div class="isg">
+          <div class="is">Fase: <strong>${inv.fase}</strong></div>
+          <div class="is">AC: <strong>${(inv.pnom_w/1000).toFixed(2)} kW</strong></div>
+          <div class="is">Max PV: <strong>${(inv.rec_pv_wp/1000).toFixed(1)} kWp</strong></div>
+          <div class="is">DC/AC: <strong>${inv.dcac.toFixed(2)}</strong></div>
+        </div>
+        <div class="rb-wrap">
+          <div class="rb-lbl"><span>DC/AC: ${inv.dcac.toFixed(2)} — ${dl}</span><span>ideaal ≤1.20</span></div>
+          <div class="rb-track"><div class="rb-fill" style="width:${dcacPct}%;background:${bc}"></div></div>
+        </div>
+        <button class="use-btn" onclick="useInverter('${inv.type}')">Gebruik in String Calculator →</button>
+      </div>`;
+    }).join('');
+  document.getElementById('inv-recommendations').innerHTML=html;
 }
 
-function useInverter(type) {
-  // Wissel naar string calculator tab en stel omvormer in
-  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-calc').classList.add('active');
-  document.querySelectorAll('.tab-btn')[1].classList.add('active');
-  document.getElementById('invSelect').value = type;
+function renderMpptToewijzing(assignments, nmppt){
+  if(!vlakken.length){ document.getElementById('mppt_toewijzing').innerHTML='<p style="color:var(--text2);font-size:.85rem">Nog geen dakvlakken.</p>'; return; }
+
+  // Groepeer per MPPT
+  const mpptGroups={};
+  assignments.forEach(({vlakId,mppt})=>{
+    const v=vlakken.find(x=>x.id===vlakId);
+    if(!v) return;
+    const key=mppt||'overloop';
+    if(!mpptGroups[key]) mpptGroups[key]=[];
+    mpptGroups[key].push(v);
+  });
+
+  let html='';
+  for(const [mppt,vls] of Object.entries(mpptGroups)){
+    const isOverflow=mppt==='overloop';
+    const color=isOverflow?'#dc2626':(MPPT_COLORS[(parseInt(mppt)-1)%MPPT_COLORS.length]);
+    const oriSet=[...new Set(vls.map(v=>v.ori))];
+    const mixed=oriSet.length>1;
+    html+=`<div style="border-radius:6px;border:1.5px solid ${color}20;background:${color}08;padding:.7rem .9rem;margin-bottom:.5rem">
+      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem">
+        <span style="background:${color};color:${isOverflow?'#fff':'#0f1f3d'};font-family:var(--mono);font-size:.72rem;font-weight:700;padding:.2rem .5rem;border-radius:3px">
+          ${isOverflow?'⚠ GEEN MPPT':'MPPT '+mppt}
+        </span>
+        ${mixed?'<span style="color:#dc2626;font-size:.75rem;font-family:var(--mono)">⚠ gemengde oriëntaties!</span>':''}
+        ${isOverflow?'<span style="color:#dc2626;font-size:.75rem;font-family:var(--mono)">Meer vlakken dan MPPT-trackers!</span>':''}
+      </div>
+      ${vls.map(v=>`
+        <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:.75rem;padding:.2rem 0;color:var(--text2)">
+          <span style="color:var(--navy);font-weight:600">${v.naam}</span>
+          <span>${v.ori} · ${v.helling}°</span>
+          <span style="color:${color};font-weight:600">${v.npan} panelen</span>
+        </div>`).join('')}
+    </div>`;
+  }
+
+  const warnings=[];
+  if(Object.keys(mpptGroups).includes('overloop'))
+    warnings.push('<div class="wb err">⚠ Meer oriëntaties dan MPPT-trackers. Overweeg een omvormer met meer MPPT-ingangen, of combineer vlakken.</div>');
+
+  document.getElementById('mppt_toewijzing').innerHTML=html+warnings.join('');
+}
+
+function useInverter(type){
+  document.getElementById('invSelect').value=type;
+  switchTab('calc',document.getElementById('tbCalc'));
   calc();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
-
-
-function calc() {
-  const type = document.getElementById('invSelect').value;
-  const inv  = DB[type];
-  if (!inv) return;
-  const [fase, vmax, vstart, vmppt_min, vmppt_max, imax, isc_max, nmppt, pnom_w, rec_pv_wp] = inv;
+// ══ STRING CALCULATOR ═══════════════════════════════════════════════════════
+function calc(){
+  const type=document.getElementById('invSelect').value;
+  const inv=DB[type]; if(!inv) return;
+  const [fase,vmax,vstart,vmppt_min,vmppt_max,imax,isc_max,nmppt,pnom_w,rec_pv_wp]=inv;
 
   // Omvormer display
-  s('d_vmax',  vmax);
-  s('d_mppt',  `${vmppt_min} – ${vmppt_max}`);
-  s('d_isc',   isc_max);
-  s('d_fase',  fase);
-  s('d_nmppt', nmppt);
-  s('d_imax',  imax);
-  s('d_pnom',  pnom_w.toLocaleString('nl-BE'));
-  s('d_recpv', rec_pv_wp.toLocaleString('nl-BE'));
+  s('d_vmax',vmax); s('d_mppt',`${vmppt_min}–${vmppt_max}`); s('d_isc',isc_max);
+  s('d_fase',fase); s('d_nmppt',nmppt); s('d_pnom',pnom_w.toLocaleString('nl-BE'));
+  s('d_recpv',rec_pv_wp.toLocaleString('nl-BE'));
 
   // Paneel
-  const voc  = g('p_voc');
-  const vmpp = g('p_vmpp');
-  const pmax = g('p_pmax');
-  const p_isc = g('p_isc');
-  const impp = g('p_impp');
-  const tvoc = g('p_tvoc');  // %/°C (negatief getal)
-  const tmin = g('p_tmin');
-  const tstc = 25;
+  const voc=g('p_voc'), vmpp=g('p_vmpp'), pmax=g('p_pmax');
+  const p_isc=g('p_isc'), impp=g('p_impp'), tvoc=g('p_tvoc'), tmin=g('p_tmin');
 
   // Kabel
-  const L    = g('k_len');
-  const pct  = g('k_pct');
-  const rho  = g('k_rho');
+  const L=g('k_len'), pct=g('k_pct'), rho=g('k_rho');
 
-  // ── BEREKENINGEN ──────────────────────────────────────────────────────────
-  // Voc bij Tmin
-  const voc_tmin = voc * (1 + (tvoc / 100) * (tmin - tstc));
+  // Basisberekeningen
+  const voc_tmin=voc*(1+(tvoc/100)*(tmin-25));
+  const max_vmax=Math.floor(vmax/voc_tmin);
+  const max_vmppt=Math.floor(vmppt_max/vmpp);
+  const min_vmppt=Math.ceil(vmppt_min/vmpp);
+  const rec_max=Math.min(max_vmax,max_vmppt);
+  const rec_min=min_vmppt;
 
-  // Max panelen op basis van Vmax (Voc bij Tmin)
-  const max_vmax  = Math.floor(vmax / voc_tmin);
-  // Max panelen op basis van MPPT Vmax (Vmpp)
-  const max_vmppt = Math.floor(vmppt_max / vmpp);
-  // Min panelen op basis van MPPT Vmin (Vmpp)
-  const min_vmppt = Math.ceil(vmppt_min / vmpp);
-
-  // Aanbevolen = strengste bovengrens
-  const rec_max = Math.min(max_vmax, max_vmppt);
-  const rec_min = min_vmppt;
-
-  // Bouw/update de stringverdeling inputs
-  buildStringInputs(nmppt, rec_max, rec_min);
-  calcStrings();
-
-  // String waarden bij rec_max (voor het resultaatblok)
-  const s_voc  = rec_max * voc_tmin;
-  const s_vmpp = rec_max * vmpp;
-  const s_impp = impp;
-  const s_pwr  = rec_max * pmax;
-
-  // Kabel bij rec_max
-  const v_verlies_max = s_vmpp * (pct / 100);
-  const s_min = (2 * L * s_impp * rho) / v_verlies_max;
-
-  let adv_sectie, adv_class;
-  if (s_min <= 4)       { adv_sectie = "4 mm²"; adv_class = "green"; }
-  else if (s_min <= 6)  { adv_sectie = "6 mm²"; adv_class = "orange"; }
-  else if (s_min <= 10) { adv_sectie = "10 mm²"; adv_class = "red"; }
-  else                  { adv_sectie = "≥16 mm²"; adv_class = "red"; }
-
-  const omslag_46  = (4  * v_verlies_max) / (2 * s_impp * rho);
-  const omslag_610 = (6  * v_verlies_max) / (2 * s_impp * rho);
-
-  // Werkelijk verlies bij gekozen sectie
-  const gekozen_s = s_min <= 4 ? 4 : s_min <= 6 ? 6 : 10;
-  const w_verlies_v = (2 * L * s_impp * rho) / gekozen_s;
-  const w_verlies_pct = (w_verlies_v / s_vmpp) * 100;
-
-  // ── DISPLAY ───────────────────────────────────────────────────────────────
-  s('r_maxpan',     rec_max);
-  s('r_maxpan_sub', `Vmax: ${max_vmax}st  ·  MPPT: ${max_vmppt}st`);
-  s('r_minpan',     rec_min);
-  s('r_svoc',       voc_tmin.toFixed(1) + ' V');
-  s('r_svoc_sub',   `string: ${s_voc.toFixed(1)} V  <  Vmax ${vmax} V`);
-  s('r_svmpp',      s_vmpp.toFixed(1) + ' V');
-  s('r_simpp',      s_impp.toFixed(2) + ' A');
-  s('r_spwr',       s_pwr + ' Wp');
+  // Display limieten
+  s('r_maxpan',rec_max);
+  s('r_maxpan_sub',`Vmax:${max_vmax}st · MPPT:${max_vmppt}st`);
+  s('r_minpan',rec_min);
+  s('r_voc_tmin',voc_tmin.toFixed(1)+' V');
+  s('r_vmpp',vmpp.toFixed(1)+' V');
+  s('r_impp',impp.toFixed(2)+' A');
 
   // Isc check
-  const isc_el = document.getElementById('isc_check');
-  if (p_isc <= isc_max) {
-    isc_el.className = 'warning-box ok';
-    isc_el.textContent = `✔  Isc paneel (${p_isc} A) ≤ max. Isc omvormer (${isc_max} A) — binnen limiet`;
-  } else {
-    isc_el.className = 'warning-box error';
-    isc_el.textContent = `✘  Isc paneel (${p_isc} A) > max. Isc omvormer (${isc_max} A) — NIET toegestaan!`;
-  }
-  if (s_voc > vmax * 0.95 && p_isc <= isc_max) {
-    isc_el.innerHTML += `<br>⚠  String Voc (${s_voc.toFixed(1)} V) nadert Vmax (${vmax} V) — controleer!`;
-    isc_el.className = 'warning-box';
-  }
+  const isc_ok=p_isc<=isc_max;
+  s('r_isc_check',isc_ok?'✔ OK':'✘ NOK');
+  s('r_isc_sub',`${p_isc}A vs ${isc_max}A max`);
+  const isc_el=document.getElementById('isc_msg');
+  isc_el.className=isc_ok?'wb ok':'wb err';
+  isc_el.textContent=isc_ok
+    ?`✔  Isc paneel (${p_isc} A) ≤ max. Isc omvormer (${isc_max} A) — OK`
+    :`✘  Isc paneel (${p_isc} A) > max. Isc omvormer (${isc_max} A) — NIET toegestaan!`;
 
-  // Kabel
-  s('r_sadv',     adv_sectie);
-  s('r_sadv_sub', `Minimaal berekend: ${s_min.toFixed(2)} mm²`);
-  const kab_adv_box = document.getElementById('kabel_box_adv');
-  kab_adv_box.className = `kabel-box ${adv_class}`;
-  s('r_omslag46',  omslag_46.toFixed(1) + ' m');
-  s('r_omslag610', omslag_610.toFixed(1) + ' m');
-  s('r_verlies',     `${w_verlies_v.toFixed(2)} V`);
-  s('r_verlies_sub', `${w_verlies_pct.toFixed(2)}% bij ${gekozen_s} mm² · ${L} m`);
-  const verlies_box = document.getElementById('kabel_box_verlies');
-  verlies_box.className = w_verlies_pct <= pct ? 'kabel-box green' : 'kabel-box red';
+  // Kabel bij rec_max
+  const s_vmpp_ref=rec_max*vmpp;
+  const v_max_verlies=s_vmpp_ref*(pct/100);
+  const s_min=(2*L*impp*rho)/v_max_verlies;
+  const adv_s=s_min<=4?4:s_min<=6?6:10;
+  const adv_lbl=adv_s<=4?'4 mm²':adv_s<=6?'6 mm²':'≥10 mm²';
+  const adv_cls=adv_s<=4?'g':adv_s<=6?'o':'r';
+  const omslag46=(4*v_max_verlies)/(2*impp*rho);
+  const omslag610=(6*v_max_verlies)/(2*impp*rho);
+  const w_v=(2*L*impp*rho)/adv_s;
+  const w_vpct=w_v/s_vmpp_ref*100;
 
-  // ── VERMOGEN & DC/AC — op basis van werkelijke stringverdeling ────────────
-  let totalPanelen = 0;
-  for (let i = 0; i < nmppt; i++) {
-    const inp = document.getElementById(`str_${i}_0`);
-    if (inp) totalPanelen += parseInt(inp.value) || 0;
-  }
-  const tot_pv = totalPanelen * pmax;
-  const dc_ac  = tot_pv / pnom_w;
+  s('r_sadv',adv_lbl);
+  s('r_sadv_sub',`min. berekend: ${s_min.toFixed(2)} mm²`);
+  s('r_omslag46',omslag46.toFixed(1)+' m');
+  s('r_omslag610',omslag610.toFixed(1)+' m');
+  s('r_verlies',`${w_v.toFixed(2)} V`);
+  s('r_verlies_sub',`${w_vpct.toFixed(2)}% bij ${adv_s}mm² · ${L}m`);
+  document.getElementById('kb_verlies').className=`kb ${w_vpct<=pct?'g':'r'}`;
 
-  s('r_totpv',     `${tot_pv.toLocaleString('nl-BE')} Wp`);
-  s('r_totpv_sub', `${totalPanelen} panelen × ${pmax} Wp (uit stringverdeling)`);
-  s('r_recpv',     `${rec_pv_wp.toLocaleString('nl-BE')} Wp`);
-  s('r_dcac',      dc_ac.toFixed(2));
+  // Stringverdeling per dakvlak
+  buildStringInputs(nmppt, rec_max, rec_min, voc_tmin, vmpp, impp, pmax, vmax, vmppt_min, vmppt_max, L, pct, rho, pnom_w, rec_pv_wp);
 
-  const dcac_box = document.getElementById('dcac_box');
-  const pwr_check = document.getElementById('pwr_check');
-  let dcac_color, dcac_bg, dcac_border, dcac_sub, pwr_msg, pwr_cls;
-
-  if (dc_ac <= 1.2) {
-    dcac_color = '#15803d'; dcac_bg = '#dcfce7'; dcac_border = '#86efac';
-    dcac_sub = 'Ideaal — minimale clipping';
-    pwr_cls  = 'warning-box ok';
-    pwr_msg  = `✔  Totaal PV (${tot_pv.toLocaleString('nl-BE')} Wp) binnen aanbevolen max. (${rec_pv_wp.toLocaleString('nl-BE')} Wp) — DC/AC ratio ${dc_ac.toFixed(2)} is ideaal.`;
-  } else if (dc_ac <= 1.5) {
-    dcac_color = '#b45309'; dcac_bg = '#fef9c3'; dcac_border = '#fde047';
-    dcac_sub = 'Aanvaardbaar — lichte clipping';
-    pwr_cls  = 'warning-box';
-    pwr_msg  = `⚠  DC/AC ratio ${dc_ac.toFixed(2)} is aanvaardbaar maar aan de hoge kant. Totaal PV ${tot_pv.toLocaleString('nl-BE')} Wp overschrijdt het aanbevolen max. van ${rec_pv_wp.toLocaleString('nl-BE')} Wp. Verwacht lichte clipping bij piekzon.`;
-  } else {
-    dcac_color = '#b91c1c'; dcac_bg = '#fee2e2'; dcac_border = '#fca5a5';
-    dcac_sub = 'Te hoog — significante clipping!';
-    pwr_cls  = 'warning-box error';
-    pwr_msg  = `✘  DC/AC ratio ${dc_ac.toFixed(2)} is te hoog! Totaal PV ${tot_pv.toLocaleString('nl-BE')} Wp overschrijdt het aanbevolen max. van ${rec_pv_wp.toLocaleString('nl-BE')} Wp significant. Overweeg minder panelen per string of een grotere omvormer.`;
-  }
-
-  dcac_box.style.background   = dcac_bg;
-  dcac_box.style.borderColor  = dcac_border;
-  document.getElementById('r_dcac').style.color = dcac_color;
-  s('r_dcac_sub', dcac_sub);
-  pwr_check.className   = pwr_cls;
-  pwr_check.textContent = pwr_msg;
-
-  // ── OVERZICHTSTABEL ───────────────────────────────────────────────────────
-  const lengths = [10, 15, 20, 25, 30, 35, 40, 50, 60];
-  const panels  = [];
-  for (let n = Math.max(1, rec_min - 2); n <= rec_max + 3; n++) panels.push(n);
-
-  let html = '<thead><tr><th class="corner">↓ pan. / m →</th>';
-  for (const L2 of lengths) {
-    html += `<th${L2 === L ? ' style="background:#b45309"' : ''}>${L2} m</th>`;
-  }
-  html += '</tr></thead><tbody>';
-
-  for (const n of panels) {
-    const isRec = (n === rec_max);
-    html += `<tr><td class="row-header"${isRec ? ' style="background:#f6b824;color:#0f1f3d;font-weight:700"' : ''}>${n} pan.${isRec ? ' ★' : ''}</td>`;
-    for (const L2 of lengths) {
-      const vsys  = n * vmpp;
-      const vvmax = vsys * (pct / 100);
-      const smin2 = (2 * L2 * impp * rho) / vvmax;
-      const active = (L2 === L && n === rec_max);
-
-      let cls, txt;
-      if (n < rec_min)         { cls = 'vmin'; txt = '< Vmin'; }
-      else if (n > rec_max)    { cls = 'err';  txt = '✘ te lang'; }
-      else if (smin2 <= 4)     { cls = 'c4';   txt = '4 mm²'; }
-      else if (smin2 <= 6)     { cls = 'c6';   txt = '6 mm²'; }
-      else if (smin2 <= 10)    { cls = 'c10';  txt = '≥10 mm²'; }
-      else                     { cls = 'err';  txt = '≥16 mm²'; }
-
-      const extra = active ? ' active-col' : '';
-      html += `<td class="${cls}${extra}">${txt}</td>`;
-    }
-    html += '</tr>';
-  }
-  html += '</tbody>';
-  document.getElementById('overzicht').innerHTML = html;
+  // Overzichtstabel
+  buildTable(rec_max, rec_min, vmpp, impp, pmax, L, pct, rho, vmppt_max, voc_tmin, vmax);
 }
 
-// Init
+function buildStringInputs(nmppt, rec_max, rec_min, voc_tmin, vmpp, impp, pmax, vmax, vmppt_min, vmppt_max, L, pct, rho, pnom_w, rec_pv_wp){
+  const wrap=document.getElementById('string_inputs');
+  const resultsWrap=document.getElementById('vlak_results');
+  const assignments=getMpptToewijzing(nmppt);
+
+  if(!vlakken.length){
+    wrap.innerHTML='<p style="color:rgba(255,255,255,.4);font-size:.8rem">Voeg dakvlakken toe in de dimensioneringstab.</p>';
+    resultsWrap.innerHTML='';
+    s('str_totaal','');
+    return;
+  }
+
+  // Bouw string inputs per vlak
+  let html='';
+  vlakken.forEach((v,i)=>{
+    const asgn=assignments.find(a=>a.vlakId===v.id);
+    const mpptNr=asgn?.mppt;
+    const color=mpptNr?MPPT_COLORS[(mpptNr-1)%MPPT_COLORS.length]:'#dc2626';
+    const mpptLabel=mpptNr?`MPPT ${mpptNr}`:'⚠ Geen MPPT';
+
+    html+=`<div class="sr">
+      <span class="sl" style="color:${color};font-weight:600">${v.naam}</span>
+      <input class="si" type="number" id="str_${v.id}" value="${v.npan}" min="0" max="50"
+        oninput="vlakken.find(x=>x.id===${v.id}).npan=parseInt(this.value)||0;updateStrings()">
+      <span class="sd" id="sdet_${v.id}">—</span>
+      <span class="sbadge sb-empty" id="sbadge_${v.id}">${mpptLabel}</span>
+    </div>`;
+  });
+  wrap.innerHTML=html;
+
+  updateStrings(nmppt, rec_max, rec_min, voc_tmin, vmpp, impp, pmax, vmax, L, pct, rho, pnom_w, rec_pv_wp);
+}
+
+// Store params for re-use in updateStrings
+let _calcParams={};
+function buildStringInputs_withParams(p){ _calcParams=p; buildStringInputs(...Object.values(p)); }
+
+function updateStrings(){
+  // Re-read from current inputs
+  const type=document.getElementById('invSelect').value;
+  const inv=DB[type]; if(!inv) return;
+  const [fase,vmax,vstart,vmppt_min,vmppt_max,imax,isc_max,nmppt,pnom_w,rec_pv_wp]=inv;
+  const voc=g('p_voc'),vmpp=g('p_vmpp'),pmax=g('p_pmax');
+  const impp=g('p_impp'),tvoc=g('p_tvoc'),tmin=g('p_tmin');
+  const L=g('k_len'),pct=g('k_pct'),rho=g('k_rho');
+  const voc_tmin=voc*(1+(tvoc/100)*(tmin-25));
+  const max_vmax=Math.floor(vmax/voc_tmin);
+  const max_vmppt=Math.floor(vmppt_max/vmpp);
+  const rec_max=Math.min(max_vmax,max_vmppt);
+  const rec_min=Math.ceil(vmppt_min/vmpp);
+  const assignments=getMpptToewijzing(nmppt);
+
+  let totPanelen=0;
+  const resultsWrap=document.getElementById('vlak_results');
+  let resultsHtml='<div style="margin-top:.8rem"><div style="font-family:var(--display);font-size:.8rem;font-weight:700;color:var(--text2);margin-bottom:.5rem;letter-spacing:.03em">VALIDATIE PER DAKVLAK</div>';
+
+  vlakken.forEach(v=>{
+    const inp=document.getElementById(`str_${v.id}`);
+    const n=inp?parseInt(inp.value)||0:v.npan;
+    totPanelen+=n;
+
+    const asgn=assignments.find(a=>a.vlakId===v.id);
+    const mpptNr=asgn?.mppt;
+    const color=mpptNr?MPPT_COLORS[(mpptNr-1)%MPPT_COLORS.length]:'#dc2626';
+
+    const det=document.getElementById(`sdet_${v.id}`);
+    const badge=document.getElementById(`sbadge_${v.id}`);
+
+    if(n===0){
+      if(det) det.textContent='niet gebruikt';
+      if(badge){badge.textContent='—';badge.className='sbadge sb-empty';}
+      resultsHtml+=vlakResultHtml(v,'—',0,0,0,'—','—',color,mpptNr,'empty');
+      return;
+    }
+
+    const s_voc=n*voc_tmin;
+    const s_vmpp=n*vmpp;
+    const vvmax=s_vmpp*(pct/100);
+    const smin=(2*L*impp*rho)/vvmax;
+    const sectie=smin<=4?'4mm²':smin<=6?'6mm²':'≥10mm²';
+    const verliesPct=((2*L*impp*rho)/(smin<=4?4:smin<=6?6:10))/s_vmpp*100;
+
+    if(det) det.textContent=`Voc:${s_voc.toFixed(0)}V Vmpp:${s_vmpp.toFixed(0)}V ${sectie}`;
+
+    let status,badgeCls,cardCls;
+    if(!mpptNr){
+      status='⚠ Geen MPPT'; badgeCls='sb-err'; cardCls='err';
+    } else if(s_voc>vmax){
+      status=`✘ Voc>${vmax}V!`; badgeCls='sb-err'; cardCls='err';
+    } else if(n<rec_min){
+      status=`< Vmin (min.${rec_min})`; badgeCls='sb-vmin'; cardCls='vmin';
+    } else if(n>rec_max){
+      status=`⚠ >${rec_max} max`; badgeCls='sb-warn'; cardCls='warn';
+    } else {
+      status=`✔ OK`; badgeCls='sb-ok'; cardCls='ok';
+    }
+
+    if(badge){badge.textContent=status;badge.className=`sbadge ${badgeCls}`;}
+    resultsHtml+=vlakResultHtml(v,status,n,s_voc,s_vmpp,sectie,verliesPct.toFixed(2)+'%',color,mpptNr,cardCls);
+  });
+
+  resultsHtml+='</div>';
+  resultsWrap.innerHTML=resultsHtml;
+
+  // Totaal & DC/AC
+  const totPv=totPanelen*pmax;
+  const dcac=totPv/pnom_w;
+  const dcacKleur=dcac<=1.2?'#86efac':dcac<=1.5?'#fde047':'#fca5a5';
+  s('str_totaal',`Totaal: ${totPanelen} panelen · ${(totPv/1000).toFixed(2)} kWp · DC/AC: ${dcac.toFixed(2)}`);
+  document.getElementById('str_totaal').querySelector&&
+    (document.getElementById('str_totaal').innerHTML=
+      `Totaal: <strong style="color:#fff">${totPanelen} panelen</strong> · ${(totPv/1000).toFixed(2)} kWp · DC/AC: <strong style="color:${dcacKleur}">${dcac.toFixed(2)}</strong>`);
+
+  // DC/AC display
+  s('r_totpv',`${totPv.toLocaleString('nl-BE')} Wp`);
+  s('r_totpv_sub',`${totPanelen} panelen × ${pmax} Wp`);
+  s('r_recpv2',`${rec_pv_wp.toLocaleString('nl-BE')} Wp`);
+  s('r_dcac',dcac.toFixed(2));
+  const dcacBox=document.getElementById('dcac_box');
+  const pwrCheck=document.getElementById('pwr_check');
+  let bg,bc,fc,sub,cls,msg;
+  if(dcac<=1.2){bg='#dcfce7';bc='#86efac';fc='#15803d';sub='Ideaal';cls='wb ok';msg=`✔  DC/AC ${dcac.toFixed(2)} is ideaal. Totaal ${totPv.toLocaleString('nl-BE')} Wp binnen rec. max ${rec_pv_wp.toLocaleString('nl-BE')} Wp.`;}
+  else if(dcac<=1.5){bg='#fef9c3';bc='#fde047';fc='#b45309';sub='Aanvaardbaar';cls='wb warn';msg=`⚠  DC/AC ${dcac.toFixed(2)} is aanvaardbaar. Verwacht lichte clipping bij piekvermogen.`;}
+  else{bg='#fee2e2';bc='#fca5a5';fc='#b91c1c';sub='Te hoog!';cls='wb err';msg=`✘  DC/AC ${dcac.toFixed(2)} is te hoog. Overweeg minder panelen of grotere omvormer.`;}
+  dcacBox.style.cssText=`border-radius:6px;border:1.5px solid ${bc};padding:.8rem 1rem;background:${bg}`;
+  document.getElementById('r_dcac').style.color=fc;
+  s('r_dcac_sub',sub);
+  pwrCheck.className=cls; pwrCheck.textContent=msg;
+}
+
+function vlakResultHtml(v,status,n,svoc,svmpp,sectie,verlies,color,mpptNr,cardCls){
+  if(cardCls==='empty') return '';
+  return `<div class="vlak-result-card ${cardCls}">
+    <div class="vr-head">
+      <div class="vr-name" style="display:flex;align-items:center;gap:.5rem">
+        <span style="width:10px;height:10px;border-radius:50%;background:${color};display:inline-block;flex-shrink:0"></span>
+        ${v.naam}
+        <span style="font-size:.72rem;font-family:var(--mono);color:var(--text2)">${v.ori} · ${v.helling}°</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:.5rem">
+        ${mpptNr?`<span style="background:${color};color:${mpptNr===1?'#0f1f3d':'#fff'};font-family:var(--mono);font-size:.68rem;font-weight:700;padding:.15rem .4rem;border-radius:3px">MPPT ${mpptNr}</span>`:''}
+        <span class="vr-badge" style="background:${cardCls==='ok'?'#dcfce7':cardCls==='warn'?'#fef9c3':cardCls==='err'?'#fee2e2':'#ede9fe'};color:${cardCls==='ok'?'#14532d':cardCls==='warn'?'#713f12':cardCls==='err'?'#7f1d1d':'#4c1d95'}">${status}</span>
+      </div>
+    </div>
+    <div class="vr-stats">
+      <div class="vr-stat">Panelen: <strong>${n}</strong></div>
+      <div class="vr-stat">String Voc: <strong>${svoc.toFixed(1)} V</strong></div>
+      <div class="vr-stat">String Vmpp: <strong>${svmpp.toFixed(1)} V</strong></div>
+      <div class="vr-stat">Kabel: <strong>${sectie} (${verlies} verlies)</strong></div>
+    </div>
+  </div>`;
+}
+
+function buildTable(rec_max, rec_min, vmpp, impp, pmax, L, pct, rho, vmppt_max, voc_tmin, vmax){
+  const lengths=[10,15,20,25,30,35,40,50,60];
+  const panels=[];
+  for(let n=Math.max(1,rec_min-1);n<=rec_max+2;n++) panels.push(n);
+
+  let html='<thead><tr><th class="corner">↓pan./m→</th>';
+  for(const l of lengths) html+=`<th${l===L?' style="background:#b45309"':''}>${l}m</th>`;
+  html+='</tr></thead><tbody>';
+
+  for(const n of panels){
+    const isRec=n===rec_max;
+    html+=`<tr><td class="rh"${isRec?' style="background:var(--yellow);color:var(--navy);font-weight:700"':''}>${n}${isRec?' ★':''}</td>`;
+    for(const l of lengths){
+      const vsys=n*vmpp, vvmax=vsys*(pct/100);
+      const smin=(2*l*impp*rho)/vvmax;
+      const svoc=n*voc_tmin;
+      const active=l===L&&n===rec_max;
+      let cls,txt;
+      if(n<rec_min){cls='vmin';txt='<Vmin';}
+      else if(svoc>vmax){cls='err';txt='Voc!';}
+      else if(n>rec_max){cls='err';txt='✘';}
+      else if(smin<=4){cls='c4';txt='4mm²';}
+      else if(smin<=6){cls='c6';txt='6mm²';}
+      else if(smin<=10){cls='c10';txt='≥10mm²';}
+      else{cls='err';txt='≥16mm²';}
+      html+=`<td class="${cls}${active?' ac':''}">${txt}</td>`;
+    }
+    html+='</tr>';
+  }
+  html+='</tbody>';
+  document.getElementById('overzicht').innerHTML=html;
+}
+
+// ══ INIT ════════════════════════════════════════════════════════════════════
+addVlak('Zuid','Z',35,10);
+addVlak('Noord','N',35,8);
 calc();
 calcDim();
 </script>
