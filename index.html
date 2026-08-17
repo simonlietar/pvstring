@@ -272,7 +272,21 @@ td.ac{outline:2px solid var(--yellow);outline-offset:-2px}
       <div class="card">
         <div class="ch"><div class="num">B</div><h2>PANEEL GEGEVENS</h2><span class="tag ti">invoer</span></div>
         <div class="cb">
-          <div class="fr"><span class="fl b">Type paneel</span><input type="text" id="d_pnaam" value="TSM-445 NEG9R.28" style="width:160px;text-align:left" oninput="calcDim()"><span class="fu"></span></div>
+          <div class="fr">
+            <span class="fl b">Selecteer paneel</span>
+            <select id="d_p_select" onchange="selectPanel(this.value,'dim')" style="min-width:220px;font-size:.78rem">
+              <option value="">— handmatig invullen —</option>
+              <optgroup label="── Trina Vertex S+ G3 (2026) ──">
+                <option value="TSM-NEG9RP.25Z-470-FB">TSM-NEG9RP.25Z 470Wp Full Black</option>
+                <option value="TSM-NEG9RP.28Z-480-W">TSM-NEG9RP.28Z 480Wp White</option>
+              </optgroup>
+              <optgroup label="── Trina Vertex S+ (2024) ──">
+                <option value="TSM-NEG9R.28-445">TSM-NEG9R.28 445Wp</option>
+              </optgroup>
+            </select>
+            <span class="fu"></span>
+          </div>
+          <div class="fr"><span class="fl bold">Type paneel</span><input type="text" id="d_pnaam" value="TSM-445 NEG9R.28" style="width:160px;text-align:left" oninput="calcDim()"><span class="fu"></span></div>
           <div class="fr"><span class="fl">Pmax per paneel</span><input type="number" id="d_pmax" value="445" step="5" oninput="calcDim()"><span class="fu">Wp</span></div>
           <div class="fr"><span class="fl">Fase voorkeur</span>
             <select id="d_fase_pref" onchange="calcDim()">
@@ -385,6 +399,20 @@ td.ac{outline:2px solid var(--yellow);outline-offset:-2px}
       <div class="card">
         <div class="ch"><div class="num">2</div><h2>PANEEL GEGEVENS (STC)</h2><span class="tag ti">invoer</span></div>
         <div class="cb">
+          <div class="fr">
+            <span class="fl b">Selecteer paneel</span>
+            <select id="p_select" onchange="selectPanel(this.value,'calc')" style="min-width:220px;font-size:.78rem">
+              <option value="">— handmatig invullen —</option>
+              <optgroup label="── Trina Vertex S+ G3 (2026) ──">
+                <option value="TSM-NEG9RP.25Z-470-FB">TSM-NEG9RP.25Z 470Wp Full Black</option>
+                <option value="TSM-NEG9RP.28Z-480-W">TSM-NEG9RP.28Z 480Wp White</option>
+              </optgroup>
+              <optgroup label="── Trina Vertex S+ (2024) ──">
+                <option value="TSM-NEG9R.28-445">TSM-NEG9R.28 445Wp</option>
+              </optgroup>
+            </select>
+            <span class="fu"></span>
+          </div>
           <div class="fr"><span class="fl b">Type</span><input type="text" id="p_naam" value="TSM-445 NEG9R.28" style="width:160px;text-align:left" oninput="calc()"><span class="fu"></span></div>
           <div class="fr"><span class="fl">Pmax</span><input type="number" id="p_pmax" value="445" oninput="calc()"><span class="fu">Wp</span></div>
           <div class="fr"><span class="fl">Voc (STC)</span><input type="number" id="p_voc" value="52.6" step="0.1" oninput="calc()"><span class="fu">V</span></div>
@@ -539,7 +567,36 @@ const DB = {
   "6K-LB0":     ["1-fase",600,50,40,560,16,20,2,6000,9000],
 };
 
-// ══ HELPERS ═════════════════════════════════════════════════════════════════
+// ══ PANEEL DATABASE ══════════════════════════════════════════════════════════
+// [naam, pmax, voc, vmpp, isc, impp, tvoc]
+const PANEL_DB = {
+  "TSM-NEG9RP.25Z-470-FB": ["Trina Vertex S+ G3 TSM-NEG9RP.25Z 470Wp FB", 470, 37.30, 31.50, 15.99, 14.93, -0.24],
+  "TSM-NEG9RP.28Z-480-W":  ["Trina Vertex S+ G3 TSM-NEG9RP.28Z 480Wp White", 480, 37.70, 32.00, 16.05, 15.00, -0.24],
+  "TSM-NEG9R.28-445":      ["Trina Vertex S+ TSM-NEG9R.28 445Wp", 445, 52.6, 44.3, 10.05, 10.71, -0.24],
+};
+
+function selectPanel(key, tab) {
+  if (!key) return;
+  const p = PANEL_DB[key];
+  if (!p) return;
+  const [naam, pmax, voc, vmpp, isc, impp, tvoc] = p;
+  if (tab === 'calc') {
+    document.getElementById('p_naam').value  = naam;
+    document.getElementById('p_pmax').value  = pmax;
+    document.getElementById('p_voc').value   = voc;
+    document.getElementById('p_vmpp').value  = vmpp;
+    document.getElementById('p_isc').value   = isc;
+    document.getElementById('p_impp').value  = impp;
+    document.getElementById('p_tvoc').value  = tvoc;
+    calc();
+  } else {
+    document.getElementById('d_pnaam').value = naam;
+    document.getElementById('d_pmax').value  = pmax;
+    calcDim();
+  }
+}
+
+
 function g(id){ return parseFloat(document.getElementById(id)?.value)||0; }
 function s(id,v){ const el=document.getElementById(id); if(el) el.textContent=v; }
 
